@@ -1,7 +1,6 @@
 import random
 import string
 
-import io, csv, pandas as pd
 from profiles.api.serializers import *
 # # import models
 from core.models import *
@@ -26,3 +25,18 @@ import openpyxl
 
 
 User = get_user_model()
+
+class ProfileRetrieveUpdate(generics.RetrieveUpdateAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes=[IsAuthenticated]
+    
+
+class ProfileList(generics.ListAPIView):
+    queryset = Profile.objects.all()
+    serializer_class =ProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+# class ProfileUpdate(generics.UpdateAPIView):
+#     queryset = Profile.objects.all()
+#     serializer_class = ProfileSerializer
