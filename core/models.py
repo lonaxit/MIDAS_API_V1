@@ -10,6 +10,9 @@ class Profile(models.Model):
     user= models.OneToOneField(User,on_delete=models.CASCADE)
     ippis = models.BigIntegerField(null=True, blank=True)
     home_address = models.CharField(max_length=350, null=True,blank=True)
+    # dob = models.DateField()
+    # employment_status = models.CharField(maxlength=100)
+    
     avatar = models.ImageField(null=True,blank=True)
     
     
@@ -52,7 +55,7 @@ class Loan(models.Model):
     
     def __str__(self):
         
-        return self.transaction_code
+        return self.product.name
     
     
 class MasterLoanDeduction(models.Model):
@@ -71,17 +74,16 @@ class MasterLoanDeduction(models.Model):
     
     def __str__(self):
         
-        return self.transaction_code
+        return self.name
     
 
 class MasterLoanDeductionSummary(models.Model):
-    
-    # narration = models.CharField(max_length=300, null=True,blank=True)
-    # entry_date = models.DateField()
+
     active = models.BooleanField(default=True)
     transaction_code = models.BigIntegerField()
+    transaction_date = models.DateField()
     monthly_cumulative = models.DecimalField(max_digits=20,decimal_places=2)
-    
+
     created_by = models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name='masterloansummary')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -94,7 +96,7 @@ class MasterLoanDeductionSummary(models.Model):
 
 class Deduction(models.Model):
 
-    loandeduction_user = models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name='deductionuser')
+    loanee = models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name='deductionuser')
     loan = models.ForeignKey(Loan, on_delete=models.CASCADE,related_name='deductions')
     credit = models.DecimalField(max_digits=20,decimal_places=2,null=True,blank=True)
     debit = models.DecimalField(max_digits=20,decimal_places=2,null=True,blank=True)
@@ -110,8 +112,64 @@ class Deduction(models.Model):
         return self.description
     
     
+class SavingMaster(models.Model):
+    name = models.CharField(max_length=200)
+    ippis_number =models.PositiveBigIntegerField()
+    narration = models.CharField(max_length=300, null=True,blank=True)
+    amount = models.DecimalField(max_digits=20,decimal_places=2)
+    transaction_code =models.BigIntegerField()
+    active =models.BooleanField(default=True)
+    transaction_date = models.DateField()
+    upload_by = models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name='savingmasteruser')
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.name
+    
+class Saving(models.Model):
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING,related_name='savinguser')
+    credit = models.DecimalField(max_digits=20,decimal_places=2,default="0.00")
+    debit = models.DecimalField(max_digits=20,decimal_places=2,default="0.00")
+    transaction_code = models.BigIntegerField()
+    transaction_date = models.DateField()
+    narration = models.CharField(max_length=350)
+    created_by = models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name='savingcreatedby')
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.user.last_name
+    
+class MasterSavingSummary(models.Model):
+    
+    active = models.BooleanField(default=True)
+    transaction_code = models.BigIntegerField()
+    transaction_date = models.DateField()
+    monthly_cumulative = models.DecimalField(max_digits=20,decimal_places=2)
+    
+    created_by = models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name='mastersavingsummary')
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        
+        return self.transaction_code    
+    
     
 
+# class Loanledger(models.Model):
+#     user =models.ForeignKey(User, on_delete=models.DO_NOTHING,related_name="ledgeruser")
+#     loan = models.ForeignKey(Loan,on_delete=models.CASCADE,related_name="ledgerloans")
+#     description = models.CharField(max_length=250)
+#     transaction_date =models.DateField()
+#     transaction_code = models.BigIntegerField()
+#     credit = models.DecimalField(max_digits=20,decimal_places=2)
+    
+    
+
+    
+    
 # 
 # class File(models.Model):
 #     id = models.CharField(primary_key=True, max_length=6)
