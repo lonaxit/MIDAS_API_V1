@@ -1,8 +1,44 @@
 from dataclasses import fields
 from rest_framework import serializers
+from users.serializers import *
 # import models
-from profiles.models import *
-from django.db.models import Q, Sum, Avg, Max, Min
+from core.models import *
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    
+    user = serializers.StringRelatedField(read_only=True)
+    avatar = serializers.ImageField(read_only=True)
+    user = UserSerializer(read_only=True)
+    # user = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Profile 
+        fields= "__all__"
+        
+    # def get_user(self,object):
+           
+    #     me = User.objects.filter(pk=object.user.pk)
+    #     return me
+
+       
+        
+        
+# used only to update the profile image
+class ProfileAvatarSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Profile 
+        fields= ("avatar",)
+        
+
+
+
+
+
 
 # class LoanSerializer(serializers.ModelSerializer):
     
