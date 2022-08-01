@@ -4,8 +4,8 @@ from profiles.api.views import *
 
 urlpatterns =[
     
-    # path("schemes/", ProductSchemeListCreate.as_view(), name="schemes"),
+    path("<int:pk>/profile/", ProfileRetrieveUpdate.as_view(), name="update-profile"),
     
-    # path("scheme-detail/<int:pk>/", ProductSchemeDetail.as_view(), name="scheme-detail"),
+    path("list-profile/", ProfileList.as_view(), name="list-profile"),
 
 ]
