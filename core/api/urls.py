@@ -19,13 +19,60 @@ urlpatterns =[
     path('product/<int:pk>/loans/', LoansByProduct.as_view(), name="product-loans"),
     
     
-    path('masterdeduction/upload',MonthlyLoanDeductionUpload.as_view(), name="upload-masterloan-deduction"),
-    path('masterdeduction/create',MonthlyLoanDeductionUpload.as_view(), name="upload-masterloan-deduction"),
+    path('masterdeduction/upload/',MonthlyLoanDeductionUpload.as_view(), name="upload-masterloan-deduction"),
+    
+    path('masterdeduction/<int:pk>/',MasterDeductionDetail.as_view(), name="update-masterdeduction"),
+    
+    path('masterdeduction/list/',ListMasterDeduction.as_view(), name="list-masterdeduction"),
     
     path('summary-list/',ListMonthlySummary.as_view(),name="summary-list"),
     
+    # loan deductions
     path('deduction-list/',DeductionsList.as_view(),name="deduction-list"),
-    path('create-deduction/<int:pk>/',DeductionsList.as_view(),name="create-deduction"),
+    
+    path('deduction/<int:pk>/',DeductionDetail.as_view(),name="deduction-detail"),
+    
+    # create bulk deduction from master records
+    path('bulk-deduction/',CreateBulkLoanDeduction.as_view(),name="bulk-deduction"),
+    
+    # create a single loan deduction given a loan id
+    path("deduction/<int:loan_pk>/create/", DeductionCreate.as_view(), name="deduction-create"),
+    
+    # given dates
+    path('balances/<str:startdate>/<str:enddate>/',ListBalances.as_view(),name="list-balances"),
+    
+    # given a loan id
+    path('loan-balance/<int:pk>/',IndividualLoanBalance.as_view(),name="loan-balances"),
+    
+    path('loan-statement/<int:userid>/<str:startdate>/<str:enddate>/',LoanStatement.as_view(), name="loan-statement"),
+    
+    
+    # Master Savings URL
+    path('mastersaving/upload/',MasterSavingUpload.as_view(), name="upload-mastersaving-deduction"),
+    
+    path('mastersaving/list/',ListMasterSaving.as_view(), name="list-mastersaving"),
+    
+    path('mastersaving/<int:pk>/',MasterSavingDetail.as_view(), name="mastersaving-detail"),
+    
+    # create bulk saving deduction from master saving records
+    path('bulk-savingdeduction/',CreateBulkSaving.as_view(),name="bulk-savingdeduction"),
+    
+    path('saving-list/',SavingsList.as_view(),name="saving-list"),
+    
+    # saving detail given a saving id
+    path('<int:pk>/saving/',SavingDetail.as_view(),name="saving-detail"),
+    
+    # create saving given userid
+    path('saving-create/<int:userid>/',CreateSaving.as_view(),name="saving-create"),
+    
+    # list saving given userid
+    path('<int:pk>/user-saving/',ListUserSavings.as_view(),name="user-saving"),
+    
+    # statement of saving
+    path('<int:pk>/<str:startdate>/<str:enddate>/statement/',StatementofSavings.as_view(),name="saving-statement"),
+    
+    # All statement by date range
+    path('<str:startdate>/<str:enddate>/statement/',allStatementByDate.as_view(),name="statement-by-date"),
     
     
 
