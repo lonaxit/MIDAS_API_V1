@@ -2,7 +2,8 @@ from dataclasses import fields
 from rest_framework import serializers
 # import models
 from core.models import *
-from django.db.models import Q, Sum, Avg, Max, Min
+from django.db.models import Q, Sum, Avg, Max, Min, Count
+
 
 class LoanSerializer(serializers.ModelSerializer):
     
@@ -13,11 +14,23 @@ class LoanSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def get_totaldebt(self,object):
-        # todo
-        # you can find aggregate using the product id or loan id from the deductions table
         
-        loans = Loan.objects.filter(owner=object.owner).aggregate(debt_sum=Sum('approved_amount'))
-        return loans['debt_sum']
+        allDeductions = Deduction.objects.filter(loan=object.pk)
+        
+        totalcredit = allDeductions.aggregate(credit=Sum('credit'))
+                        
+        totaldebit = allDeductions.aggregate(debit=Sum('debit'))
+        credit = totalcredit['credit']
+        debit = totaldebit['debit']
+       
+        if not credit:
+            credit=0
+        if not debit:
+            debit=0            
+                        
+        payments = credit - debit
+        
+        return object.approved_amount - payments
     
     
 class ProductSerializer(serializers.ModelSerializer):
@@ -42,23 +55,17 @@ class LoanUploadSerializer(serializers.Serializer):
     file = serializers.FileField()
     
 
-
-
-        
-# not used
-# class MonthlyLoanDeductionSerializer(serializers.ModelSerializer):
+class MonthlyLoanDeductionSerializer(serializers.ModelSerializer):
     
-#     class Meta:
-#         model = MonthlyLoanDeduction
-#         fields = "__all__"
+    class Meta:
+        model = MasterLoanDeduction
+        fields = "__all__"
 
 
 class MasterLoanDeductionUploadSerializer(serializers.Serializer):
  
         file = serializers.FileField()
         
-
-
 
 class MasterLoanDeductionSummarySerializer(serializers.ModelSerializer):
     narration = serializers.SerializerMethodField()
@@ -82,22 +89,207 @@ class MasterLoanDeductionSummarySerializer(serializers.ModelSerializer):
 
 class DeductionSerializer(serializers.ModelSerializer):
     # deductions = LoanSerializer(many=True, read_only=True)
+    loan = serializers.CharField(source='loan.product.name') 
+    loanee = serializers.StringRelatedField()
+    created_by = serializers.StringRelatedField()
+    loan = serializers.StringRelatedField()
     class Meta:
         model = Deduction
         fields = "__all__"
     
 
-
-
-
-
-
-
-# scores = scoresList.filter(student=student.student).aggregate(subject_total=Sum('subjecttotal'))
- # scores = Scores.objects.filter(student=studentid,studentclass=classroom,term=termObj,session=sessionObj).aggregate(term_sum=Sum('subjecttotal'))
-
-    # term_sum = scores['term_sum']
+# get cumulative loan balances of all active loans
+class AllLoanBalancesByDateSerializer(serializers.ModelSerializer):
     
+    balance = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Loan
+        # fields ="__all__"
+        fields  = ('id', 'owner','balance')
+        
+        
+    def get_balance(self,object):
+        
+        start_date = self.context['startdate']
+        end_date = self.context['enddate']
+        
+        principal = Loan.objects.filter(owner=object.owner).aggregate(pay=Sum('approved_amount'))
+        
+        totalCredit = Deduction.objects.filter(loanee=object.owner,transaction_date__gte=start_date,transaction_date__lte=end_date).aggregate(credit=Sum('credit'))
+        
+        totalDebit = Deduction.objects.filter(loanee=object.owner,transaction_date__gte=start_date,transaction_date__lte=end_date).aggregate(debit=Sum('debit'))
+        
+        #  result = list(Subject.objects.filter(subjectteacher__classroom_id=pk,subjectteacher__teacher_id=loggedin).values())
+
+        credit = totalCredit['credit']
+        debit = totalDebit['debit']
+       
+        if not credit:
+            credit=0
+        if not debit:
+            debit=0            
+                        
+        payments = credit - debit
+        
+        bal = principal['pay']-payments
+        
+        return bal
+    
+# Get individual Loan Balance
+
+class IndividualLoanBalanceSerializer(serializers.ModelSerializer):
+    
+    deductions = serializers.SerializerMethodField()
+    principal =serializers.SerializerMethodField()
+    totalCredit =serializers.SerializerMethodField()
+    totalDebit =serializers.SerializerMethodField()
+    balance =serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Loan
+      
+        fields  = ('id', 'product','owner','deductions','principal','totalCredit','totalDebit','balance')
+        
+    def get_deductions(self,object):
+        
+        allDeductions = Deduction.objects.filter(loan=object.pk).values()
+        
+        return allDeductions
+    
+    def get_principal(self,object):
+        
+        return object.approved_amount
+    
+    def get_totalCredit(self,obj):
+        
+        credit = Deduction.objects.filter(loan=obj.pk).aggregate(credit=Sum('credit'))
+        credit = credit['credit']
+        if not credit:
+            credit=0
+            
+        return credit
+    
+    def get_totalDebit(self,obj):
+            
+        debit = Deduction.objects.filter(loan=obj.pk).aggregate(debit=Sum('debit'))
+        
+        debit = debit['debit']
+        if not debit:
+            debit=0
+            
+        return debit
+         
+    def get_balance(self,object):
+        
+        totalCredit = Deduction.objects.filter(loan=object.pk).aggregate(credit=Sum('credit'))
+        
+        totalDebit = Deduction.objects.filter(loan=object.pk).aggregate(debit=Sum('debit'))
+        
+    
+        credit = totalCredit['credit']
+        debit = totalDebit['debit']
+       
+        if not credit:
+            credit=0
+        if not debit:
+            debit=0            
+                        
+        payments = credit - debit
+        
+        bal = object.approved_amount-payments
+        
+        return bal
+        
+
+# User Loan Statement By Date
+class UserLoanStatementByDateSerializer(serializers.ModelSerializer):
+    
+    deductions = serializers.SerializerMethodField()
+    principal =serializers.SerializerMethodField()
+    totalCredit =serializers.SerializerMethodField()
+    totalDebit =serializers.SerializerMethodField()
+    balance =serializers.SerializerMethodField()
+    
+    product = serializers.CharField(source='product.name') 
+    
+    class Meta:
+        model = Loan
+      
+        fields  = ('id', 'product','owner','deductions','principal','totalCredit','totalDebit','balance')
+        
+    def get_deductions(self,object):
+        start_date = self.context['startdate']
+        end_date = self.context['enddate']
+        
+        allDeductions = Deduction.objects.filter(loan=object.pk,transaction_date__gte=start_date,transaction_date__lte=end_date)
+    
+        return list(allDeductions.values())
+    
+    def get_principal(self,object):
+        
+        return object.approved_amount
+    
+    def get_totalCredit(self,obj):
+        
+        credit = Deduction.objects.filter(loan=obj.pk).aggregate(credit=Sum('credit'))
+        credit = credit['credit']
+        if not credit:
+            credit=0
+            
+        return credit
+    
+    def get_totalDebit(self,obj):
+            
+        debit = Deduction.objects.filter(loan=obj.pk).aggregate(debit=Sum('debit'))
+        
+        debit = debit['debit']
+        if not debit:
+            debit=0
+            
+        return debit
+         
+    def get_balance(self,object):
+        
+        totalCredit = Deduction.objects.filter(loan=object.pk).aggregate(credit=Sum('credit'))
+        
+        totalDebit = Deduction.objects.filter(loan=object.pk).aggregate(debit=Sum('debit'))
+        
+    
+        credit = totalCredit['credit']
+        debit = totalDebit['debit']
+       
+        if not credit:
+            credit=0
+        if not debit:
+            debit=0            
+                        
+        payments = credit - debit
+        
+        bal = object.approved_amount-payments
+        
+        return bal
+
+
+# upload saving master record serializer
+class SavingMasterUploadSerializer(serializers.Serializer):
+     
+        file = serializers.FileField()
+
+class SavingMasterSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = SavingMaster
+        fields = "__all__"
+
+class SavingSerializer(serializers.ModelSerializer):
+    # deductions = LoanSerializer(many=True, read_only=True)
+    user = serializers.StringRelatedField()
+    created_by = serializers.StringRelatedField()
+
+    class Meta:
+        model = Saving
+        fields = "__all__"  
     
 # ******************************* 
 # class FileUploadSerializer(serializers.Serializer):
