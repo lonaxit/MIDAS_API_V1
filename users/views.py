@@ -1,10 +1,11 @@
 from urllib import response
+from xml.dom import ValidationErr
 from django.shortcuts import render
 
 from rest_framework.views import APIView
 # from rest_framework import status,permissions
 
-from rest_framework import status
+from rest_framework import generics, status
 # from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework.response import Response
 
@@ -15,11 +16,13 @@ User = get_user_model()
 from .serializers  import *
 # using permissions 
 from rest_framework.permissions import *
-
+from core.api.permissions import *
+from django.contrib.auth.hashers import make_password
 
 # user creation view 
 class RegistrationView(APIView):
-    permission_classes = [IsAuthenticated]
+    
+    permission_classes = [IsAuthenticated,IsAuthOrReadOnly]
     
     def post(self, request):
         
@@ -94,10 +97,11 @@ class RegistrationView(APIView):
                 status =status.HTTP_500_INTERNAL_SERVER_ERROR
             )
  
-#  get user info
+#  get logged in user info
+    
 class RetrieveUserView(APIView):
     
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,IsAuthOrReadOnly]
     
     def get(self,request):
         
@@ -108,15 +112,11 @@ class RetrieveUserView(APIView):
                 {'user':user.data},
                 status= status.HTTP_200_OK
             )
-        # except:
-        #     return Response(
-        #         {'error':'Unable to retrieve data'},
-        #         status =status.HTTP_500_INTERNAL_SERVER_ERROR
-        #     )
+       
             
 
 class retrieveAllUsers(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,IsAuthOrReadOnly]
     
     
     def get(self,request):
@@ -132,3 +132,66 @@ class retrieveAllUsers(APIView):
                 {'error':'Unable to retrieve data'},
                 status =status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+# update user
+class UpdateUser(generics.RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class =UserSerializer
+    permission_classes =[IsAuthOrReadOnly]
+    
+
+# Update password for user given a user id
+class UpdateUserPassword(APIView):
+    
+    permission_classes=[IsAuthOrReadOnly]
+    # throttle_classes= [AnonRateThrottle]
+    
+    # def get(self,request,pk):
+        
+    #     try:
+    #         user = User.objects.get(pk=pk)
+    #     except User.DoesNotExist:
+            
+    #         # creating a custom message
+    #         return Response({'Error': 'Not Found'},
+    #                status=status.HTTP_404_NOT_FOUND
+    #                )
+             
+    #     serializer = UpdateUserPasswordSerializer(user)
+    #     return Response(serializer.data)
+    
+    
+    def put(self,request,pk):
+        
+        
+        user = User.objects.get(pk=pk)
+        password = make_password(request.data['password'])
+        user.password = password
+        user.save()
+        return Response('Password Reset Successful!')
+    
+    
+
+# Update password for user given a username
+class UpdatePasswordUsername(APIView):
+    
+    # permission_classes=[IsAuthOnly]
+    # throttle_classes= [AnonRateThrottle]
+    
+    def put(self,request):
+        
+        username = request.data['username']
+        try:
+            user = User.objects.get(username=username)
+            password = make_password(request.data['password'])
+            
+            user.password = password
+            user.save()
+            return Response('Password Reset Successful!')
+        
+        except User.DoesNotExist:
+            raise ValidationErr('Username does not exist')
+        
+        
+      
+        
+    
