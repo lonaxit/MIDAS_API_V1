@@ -14,6 +14,7 @@ urlpatterns =[
     
     path('loan-upload/', LoanUpload.as_view(),name='loan-upload'),
     path('loan-list-create/', LoanListCreate.as_view(), name='loan-list-create'),
+    path('<int:pk>/loans/', LoansByUser.as_view(), name='user-loans'),
     path('loan/<int:pk>/', LoanDetail.as_view(), name='loan-detail'),
     path('product/<int:pk>/loans/', LoansByProduct.as_view(), name="product-loans"),
     
