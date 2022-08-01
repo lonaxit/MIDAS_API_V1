@@ -23,5 +23,7 @@ urlpatterns = [
     path('api/v1/',include('core.api.urls')),
     
     # custom registration app
-     path('auth/', include('users.urls'))
+     path('auth/', include('users.urls')),
+     path('api/v1/',include('profiles.api.urls')),
+     path('api/v1/',include('cooperators.api.urls'))
 ]
