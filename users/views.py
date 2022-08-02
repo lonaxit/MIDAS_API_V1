@@ -136,13 +136,13 @@ class retrieveAllUsers(APIView):
 class UpdateUser(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class =UserSerializer
-    permission_classes =[IsAuthOrReadOnly]
+    permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
     
 
 # Update password for user given a user id
 class UpdateUserPassword(APIView):
     
-    permission_classes=[IsAuthOrReadOnly]
+    permission_classes=[IsAuthenticated & IsAuthOrReadOnly]
     # throttle_classes= [AnonRateThrottle]
     
     # def get(self,request,pk):
