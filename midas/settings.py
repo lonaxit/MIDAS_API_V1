@@ -47,14 +47,16 @@ INSTALLED_APPS = [
     'users',
     'core',
     'profiles',
-    'cooperators'
-]
+    'cooperators',
+    
+ ]
 
 # config
 CORS_ALLOWED_ORIGIN=[
     'http://localhost:8080',
     'http://127.0.0.1:8080',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
