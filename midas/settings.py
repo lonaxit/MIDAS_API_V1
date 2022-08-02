@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'core',
     'profiles',
     'cooperators',
-    
+    'drf_spectacular',
  ]
 
 # config
@@ -155,6 +155,15 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'MIDAS Project API',
+    'DESCRIPTION': 'An app to manage records of a small cooperative society',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
 }
 
 # custom user
