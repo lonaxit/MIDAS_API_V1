@@ -174,6 +174,10 @@ class UpdateUserPassword(APIView):
 # Update password for user given a username
 class UpdatePasswordUsername(APIView):
     
+    """
+    put method
+    update a password given a user name
+    """
     # permission_classes=[IsAuthOnly]
     # throttle_classes= [AnonRateThrottle]
     
