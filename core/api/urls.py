@@ -69,10 +69,10 @@ urlpatterns =[
     path('<int:pk>/user-saving/',ListUserSavings.as_view(),name="user-saving"),
     
     # statement of saving
-    path('<int:pk>/<str:startdate>/<str:enddate>/statement/',StatementofSavings.as_view(),name="saving-statement"),
+    path('<int:pk>/<str:startdate>/<str:enddate>/mystatement/',StatementofSavings.as_view(),name="saving-statement"),
     
     # All statement by date range
-    path('<str:startdate>/<str:enddate>/statement/',allStatementByDate.as_view(),name="statement-by-date"),
+    path('<str:startdate>/<str:enddate>/allstatement/',allStatementByDate.as_view(),name="statement-by-date"),
     
     
 
