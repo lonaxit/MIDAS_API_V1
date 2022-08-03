@@ -35,14 +35,14 @@ class ProductSchemeListCreate(generics.ListCreateAPIView):
     # ListCreateAPIView gives us both the get and post methods
     queryset = ProductScheme.objects.all()
     serializer_class = ProductSchemeSerializer
-    permission_classes =[IsAuthenticated,IsAuthOrReadOnly]
+    permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
 
 
 
 class ProductSchemeDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset =ProductScheme.objects.all()
     serializer_class = ProductSchemeSerializer
-    permission_classes =[IsAuthenticated,IsAuthOrReadOnly]
+    permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
     
     
     
@@ -50,14 +50,14 @@ class ProductSchemeDetail(generics.RetrieveUpdateDestroyAPIView):
 class ProductList(generics.ListAPIView):
     queryset =Product.objects.all()
     serializer_class= ProductSerializer
-    permission_classes =[IsAuthenticated,IsAuthOrReadOnly]
+    permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
     
 
 # create product
 class ProductCreate(generics.CreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes= [IsAuthenticated,IsAuthOrReadOnly]
+    permission_classes= [IsAuthenticated & IsAuthOrReadOnly]
     
     def perform_create(self,serializer):
         scheme_pk = self.kwargs.get('pk')
@@ -75,14 +75,14 @@ class ProductCreate(generics.CreateAPIView):
 class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes=[IsAuthenticated,IsAuthOrReadOnly]
+    permission_classes=[IsAuthenticated & IsAuthOrReadOnly]
 
 
 
 class LoanUpload(generics.CreateAPIView):
     serializer_class = LoanSerializer
     parser_classes = (MultiPartParser, FormParser,)
-    permission_classes = [IsAuthenticated,IsAuthOrReadOnly]
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
     
     def get_queryset(self):
         # just return the review object
@@ -133,14 +133,23 @@ class LoanListCreate(generics.ListCreateAPIView):
     
     queryset = Loan.objects.all()
     serializer_class = LoanSerializer
-    permission_classes =[IsAuthenticated]
+    permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
     
 
 # list loans by an individual user
 class LoansByUser(generics.ListAPIView):
+    """
+    List Method
+
+    Parameters:
+        user id
+
+    Returns:
+        A list of loans for user
+    """
       
     serializer_class = LoanSerializer
-    permission_classes =[IsAuthenticated]
+    permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
     lookup_field ='owner'
     
     # works as well
@@ -189,12 +198,14 @@ class LoansByUser(generics.ListAPIView):
 
 # get detail of a specific loan
 class LoanDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Get Detail of a  loan using loan id
+
+    """
     
-    # allow get, put and destroy methods
     queryset = Loan.objects.all()
     serializer_class = LoanSerializer
-    
-    # permission_classes = [IsReviewUserOrReadOnly]
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
     
 #     # throttle_classes =[UserRateThrottle,AnonRateThrottle]
     
@@ -209,7 +220,7 @@ class LoanDetail(generics.RetrieveUpdateDestroyAPIView):
 class LoansByProduct(generics.ListAPIView):
   
     serializer_class = LoanSerializer
-    permission_classes =[IsAuthenticated,IsAuthOrReadOnly]
+    permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
   
     
     # over writing default queryset 
@@ -302,27 +313,27 @@ class ListMasterDeduction(generics.ListAPIView):
 class ListMonthlySummary(generics.ListAPIView):
     serializer_class = MasterLoanDeductionSummarySerializer
     queryset = MasterLoanDeductionSummary.objects.all()
-    permission_classes =[IsAuthenticated,IsAuthOrReadOnly]
+    permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
     
-# individual loan deduction
+# list loan deductions
 class DeductionsList(generics.ListAPIView):
     serializer_class = DeductionSerializer
     queryset = Deduction.objects.all()
-    permission_classes =[IsAuthenticated,IsAuthOrReadOnly] 
+    permission_classes =[IsAuthenticated & IsAuthOrReadOnly] 
     
 
 
 class DeductionDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Deduction.objects.all()
     serializer_class = DeductionSerializer
-    permission_classes=[IsAuthenticated,IsAuthOrReadOnly] 
+    permission_classes=[IsAuthenticated & IsAuthOrReadOnly] 
     
 
 # Create bulk deduction from a master deduction table
 class CreateBulkLoanDeduction(generics.CreateAPIView):
     
     serializer_class = DeductionSerializer
-    permission_classes = [IsAuthenticated,IsAuthOrReadOnly]
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
     # throttle_classes=[ReviewCreateThrottle]
     
     def get_queryset(self):
@@ -452,24 +463,31 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
             raise ValidationError('No unprocessed deductions yet!')
         
 class DeductionCreate(generics.CreateAPIView):
-     serializer_class = DeductionSerializer
-     permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+    """
+    Create a deduction given a loan id
+   
+    """
+
+    serializer_class = DeductionSerializer
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
     
 
-     def get_queryset(self):
+    def get_queryset(self):
         return Deduction.objects.all()
     
-     def perform_create(self, serializer):
-         
-         pk = self.kwargs.get('loan_pk')
-         try:
+    def perform_create(self, serializer):
+        
+        pk = self.kwargs.get('loan_pk')
+        try:
              loanObj = Loan.objects.get(pk=pk)
              user = loanObj.owner
              
              serializer.save(loanee=user,loan=loanObj,created_by=user)
              
-         except Loan.DoesNotExist:
-             raise ValidationError('No Loan Record Found!')
+        except Loan.DoesNotExist:
+            
+            raise ValidationError('No Loan Record Found!')
 
 
 
@@ -477,7 +495,7 @@ class DeductionCreate(generics.CreateAPIView):
 class ListBalances(generics.ListAPIView):
     
     serializer_class = AllLoanBalancesByDateSerializer
-    permission_classes= [IsAuthenticated,IsAuthOrReadOnly]
+    permission_classes= [IsAuthenticated & IsAuthOrReadOnly]
     
     def get_queryset(self):
         
@@ -498,7 +516,7 @@ class ListBalances(generics.ListAPIView):
 class IndividualLoanBalance(generics.RetrieveAPIView):
   
     serializer_class = IndividualLoanBalanceSerializer
-    permission_classes= [IsAuthenticated,IsLoanOwnerOrStaff]
+    permission_classes= [IsAuthenticated & IsAuthOrReadOnly]
     
     def get_queryset(self):
         
@@ -509,7 +527,7 @@ class IndividualLoanBalance(generics.RetrieveAPIView):
 class LoanStatement(generics.ListAPIView):
     
     serializer_class = UserLoanStatementByDateSerializer
-    permission_classes= [IsAuthenticated,IsLoanOwnerOrStaff]
+    permission_classes= [IsAuthenticated & IsAuthOrReadOnly]
     
     def get_queryset(self):
         
@@ -662,7 +680,7 @@ class SavingDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
 
 
-# create  saving Manually
+# create  saving Manually given a user id
 class CreateSaving(generics.CreateAPIView):
     serializer_class = SavingSerializer
     queryset = Saving.objects.all()
@@ -718,7 +736,7 @@ class StatementofSavings(generics.ListAPIView):
             Savings = Saving.objects.filter(user=user,transaction_date__gte=start,transaction_date__lte=end)
             
             if not Savings:
-                raise ValidationError('No saviongs or search criteria not fulfilled')
+                raise ValidationError('No savings or search criteria not fulfilled')
             return Savings
         
         except User.DoesNotExist:          
