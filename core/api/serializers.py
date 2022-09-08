@@ -33,13 +33,30 @@ class LoanSerializer(serializers.ModelSerializer):
         return object.approved_amount - payments
     
     
+# class ProductSerializer(serializers.ModelSerializer):
+#     loans = LoanSerializer(many=True, read_only=True)
+#     product_scheme = serializers.StringRelatedField(read_only=True)
+    
+    
+#     class Meta:
+#         model=Product
+#         fields= '__all__'
+        
 class ProductSerializer(serializers.ModelSerializer):
     loans = LoanSerializer(many=True, read_only=True)
-    product_scheme = serializers.StringRelatedField(read_only=True)
+    # product_scheme = serializers.StringRelatedField(read_only=True)
+    scheme = serializers.SerializerMethodField()
+
+   
     
     class Meta:
         model=Product
         fields= '__all__'
+    
+    def get_scheme(self,object):
+        
+        Scheme = ProductScheme.objects.get(pk=object.product_scheme.pk)
+        return Scheme.name
         
         
 class ProductSchemeSerializer(serializers.ModelSerializer):
