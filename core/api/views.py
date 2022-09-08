@@ -44,7 +44,14 @@ class ProductSchemeDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProductSchemeSerializer
     permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
     
+    # ========================
+class ProductListCreate(generics.ListCreateAPIView):
+        
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
     
+    # =========================
     
 # List all products
 class ProductList(generics.ListAPIView):
@@ -54,22 +61,22 @@ class ProductList(generics.ListAPIView):
     
 
 # create product
-class ProductCreate(generics.CreateAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    permission_classes= [IsAuthenticated & IsAuthOrReadOnly]
+# class ProductCreate(generics.CreateAPIView):
+#     queryset = Product.objects.all()
+#     serializer_class = ProductSerializer
+#     permission_classes= [IsAuthenticated & IsAuthOrReadOnly]
     
-    def perform_create(self,serializer):
-        scheme_pk = self.kwargs.get('pk')
+#     def perform_create(self,serializer):
+#         scheme_pk = self.kwargs.get('pk')
         
-        # get the Scheme
-        # productScheme = ProductScheme.objects.get(pk=scheme_pk)
+#         # get the Scheme
+#         # productScheme = ProductScheme.objects.get(pk=scheme_pk)
 
-        productScheme = get_object_or_404(ProductScheme, pk=scheme_pk)
+#         productScheme = get_object_or_404(ProductScheme, pk=scheme_pk)
         
-        # _user = self.request.user
+#         # _user = self.request.user
     
-        serializer.save(product_scheme=productScheme)
+#         serializer.save(product_scheme=productScheme)
 
 
 class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
