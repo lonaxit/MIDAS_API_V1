@@ -8,8 +8,13 @@ urlpatterns =[
     
     path("scheme-detail/<int:pk>/", ProductSchemeDetail.as_view(), name="scheme-detail"),
     
-    path("product-list/", ProductList.as_view(), name="product-list"),
-    path("product-create/<int:pk>/", ProductCreate.as_view(), name="product-create"),
+    # =====
+    path("products/",ProductListCreate.as_view(),name="products"),
+    # ======
+    
+    # path("product-list/", ProductList.as_view(), name="product-list"),
+    # path("product-create/<int:pk>/", ProductCreate.as_view(), name="product-create"),
+    
     path("product-detail/<int:pk>/", ProductDetail.as_view(), name="product-detail"),
     
     path('loan-upload/', LoanUpload.as_view(),name='loan-upload'),
