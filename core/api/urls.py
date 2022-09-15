@@ -8,9 +8,9 @@ urlpatterns =[
     
     path("scheme-detail/<int:pk>/", ProductSchemeDetail.as_view(), name="scheme-detail"),
     
-    # =====
+  
     path("products/",ProductListCreate.as_view(),name="products"),
-    # ======
+    
     
     # path("product-list/", ProductList.as_view(), name="product-list"),
     # path("product-create/<int:pk>/", ProductCreate.as_view(), name="product-create"),
@@ -18,7 +18,8 @@ urlpatterns =[
     path("product-detail/<int:pk>/", ProductDetail.as_view(), name="product-detail"),
     
     path('loan-upload/', LoanUpload.as_view(),name='loan-upload'),
-    path('loan-list-create/', LoanListCreate.as_view(), name='loan-list-create'),
+    path('loans/', LoanListCreate.as_view(), name='loans-'),
+    path('loan-create/<int:pk>/', LoanCreate.as_view(), name='loan-create'),
     path('<int:pk>/loans/', LoansByUser.as_view(), name='user-loans'),
     path('loan/<int:pk>/', LoanDetail.as_view(), name='loan-detail'),
     path('product/<int:pk>/loans/', LoansByProduct.as_view(), name="product-loans"),
