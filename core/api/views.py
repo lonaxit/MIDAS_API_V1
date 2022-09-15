@@ -96,6 +96,7 @@ class LoanUpload(generics.CreateAPIView):
         return Loan.objects.all()
     
     def post(self, request, *args, **kwargs):
+        
         data = request.FILES['file']
         reader = pd.read_excel(data)
         dtframe = reader
@@ -117,14 +118,14 @@ class LoanUpload(generics.CreateAPIView):
                                     owner=User.objects.get(pk=dtframe.owner),
                                     product=Product.objects.get(pk=dtframe.product),
                                     transaction_code = random_number,
-                                    applied_amount=dtframe.applied_amount,
+                                    applied_amount=int(dtframe.applied_amount),
                                     loan_date = dtframe.loan_date,
                                     start_date=dtframe.start_date,
                                     end_date = dtframe.end_date,
-                                    approved_amount=dtframe.approved_amount,
-                                    monthly_deduction=dtframe.monthly_deduction,
-                                    net_pay=dtframe.net_pay,
-                                    tenor=dtframe.tenor,
+                                    approved_amount=int(dtframe.approved_amount),
+                                    monthly_deduction=int(dtframe.monthly_deduction),
+                                    net_pay=int(dtframe.net_pay),
+                                    tenor=int(dtframe.tenor),
                                     created_by=User.objects.get(pk=dtframe.created_by),
                                     )
             except Exception as e:
@@ -135,13 +136,80 @@ class LoanUpload(generics.CreateAPIView):
                 status = status.HTTP_201_CREATED
                 )
 
-# List all loans in the system/create loans
+# List all loans in the system
 class LoanListCreate(generics.ListCreateAPIView):
     
     queryset = Loan.objects.all()
-    serializer_class = LoanSerializer
+    serializer_class = LoanListCreateSerializer
     permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
     
+    def perform_create(self,serializer):
+        
+        createdBy = self.request.user
+        serializer.save(created_by=createdBy)
+        
+    
+
+# create a loan given a user ID
+class LoanCreate(generics.CreateAPIView):
+    
+    """
+    Create a Loan given a user id
+   
+    """
+
+    serializer_class = LoanSerializer
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+
+    def get_queryset(self):
+        return Loan.objects.all()
+    
+    def perform_create(serializer,self, request,):
+        
+        pk = self.kwargs.get('int')
+        try:
+             userObj = User.objects.get(pk=pk)
+             action_by = request.user
+             
+             serializer.save(owner=userObj,created_by=action_by)
+             
+        except User.DoesNotExist:
+            
+            raise ValidationError('This user does not exist!')
+        
+     # works as well
+     
+# class LoansByUser(APIView):
+#     queryset = Loan.objects.all()  
+#     serializer_class = LoanSerializer
+#     permission_classes =[IsAuthenticated]
+#     lookup_field ='owner'
+    
+    
+#     def get(self,request,*args,**kwargs):
+        
+#         user_pk = self.kwargs['pk']
+#         try:
+#             user = User.objects.get(pk=user_pk)
+#             Loans = Loan.objects.filter(owner=user)
+            
+#             if not Loans:
+#                 return Response({'Error': 'User Not Found!'},
+#                     status=status.HTTP_404_NOT_FOUND)
+#             return Response(list(Loans.values()))
+        
+#         except User.DoesNotExist:
+            
+#             return Response({'Error': 'User Not Found!'},
+#                     status=status.HTTP_404_NOT_FOUND)
+
+
+
+
+    
+   
+
 
 # list loans by an individual user
 class LoansByUser(generics.ListAPIView):
@@ -159,46 +227,23 @@ class LoansByUser(generics.ListAPIView):
     permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
     lookup_field ='owner'
     
-    # works as well
-    # class LoansByUser(APIView):
-          
-    # serializer_class = LoanSerializer
-    # permission_classes =[IsAuthenticated]
-    # lookup_field ='owner'
-    # def get(self,request,*args,**kwargs):
-        
-    #     user_pk = self.kwargs['pk']
-    #     try:
-    #         user = User.objects.get(pk=user_pk)
-    #         Loans = Loan.objects.filter(owner=user)
-            
-    #         if not Loans:
-    #             raise ValidationError('User Has No Loans!')
-    #         return Response(list(Loans.values()))
-        
-    #     except User.DoesNotExist:
-            
-    #         return Response({'Error': 'User Not Found!'},
-    #                 status=status.HTTP_404_NOT_FOUND)
-            
-            
     # over writing default queryset 
     def get_queryset(self):
         # get the wachlist pk
         user_pk = self.kwargs['pk']
-        try:
-            user = User.objects.get(pk=user_pk)
-            Loans = Loan.objects.filter(owner=user)
+        # try:
+            # user = User.objects.get(pk=user_pk)
+        Loans = Loan.objects.filter(owner=user_pk)
             
-            if not Loans:
-                raise ValidationError('No Loans For This User')
-            return Loans
+            # if not Loans:
+            #     raise ValidationError('No Loans For This User')
+        return Loans
         
-        except User.DoesNotExist:
+        # except User.DoesNotExist:
             
             # get_queryset shoud not return a response
             # return Response({'Error': 'Movie Not Found'},status=status.HTTP_404_NOT_FOUND)
-            raise ValidationError('User Does Not exist')
+            # raise ValidationError('User Does Not exist')
        
         
     
@@ -410,7 +455,7 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                         if(bal and bal <= singleLoan.monthly_deduction):
                             ippis_Deduction = ippis_Deduction-bal
                             
-                            print(ippis_Deduction)
+                           
                             
                             Deduction.objects.create(  
                                     loanee=profile.user,
@@ -434,8 +479,7 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                             
                         elif(bal and bal > ippis_Deduction):
                             ippis_Deduction = ippis_Deduction-singleLoan.monthly_deduction
-                            
-                            print(ippis_Deduction)
+                          
                             
                             Deduction.objects.create(  
                                     loanee=profile.user,
@@ -469,6 +513,7 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
         else:
             raise ValidationError('No unprocessed deductions yet!')
         
+        
 class DeductionCreate(generics.CreateAPIView):
     
     """
@@ -483,14 +528,14 @@ class DeductionCreate(generics.CreateAPIView):
     def get_queryset(self):
         return Deduction.objects.all()
     
-    def perform_create(self, serializer):
+    def perform_create(self, request,serializer):
         
         pk = self.kwargs.get('loan_pk')
         try:
              loanObj = Loan.objects.get(pk=pk)
              user = loanObj.owner
              
-             serializer.save(loanee=user,loan=loanObj,created_by=user)
+             serializer.save(loanee=user,loan=loanObj,created_by=request.user)
              
         except Loan.DoesNotExist:
             
