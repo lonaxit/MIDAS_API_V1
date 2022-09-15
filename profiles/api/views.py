@@ -2,6 +2,7 @@ import random
 import string
 
 from profiles.api.serializers import *
+from core.api.serializers import *
 # # import models
 from core.models import *
 from django.contrib.auth import get_user_model
@@ -22,6 +23,8 @@ from rest_framework.parsers import MultiPartParser,FormParser
 
 import openpyxl
 
+from core.api.permissions import *
+
 
 
 User = get_user_model()
@@ -36,6 +39,78 @@ class ProfileList(generics.ListAPIView):
     queryset = Profile.objects.all()
     serializer_class =ProfileSerializer
     permission_classes = [IsAuthenticated]
+    
+
+
+# Get a user's profile detail 
+class GetProfile(generics.RetrieveAPIView):
+  
+    serializer_class = ProfileSerializer
+    permission_classes= [IsAuthenticated & IsAuthOrReadOnly]
+    lookup_field ='user'
+    
+    def get_queryset(self):
+    
+        return Profile.objects.all()
+
+
+
+# search user using the search bar
+class ProfileSearch(generics.RetrieveAPIView):
+    """
+    List Method
+
+    Parameters:
+        user id
+
+    Returns:
+        A user profile
+    """
+      
+    serializer_class = ProfileSerializer
+    permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
+    lookup_field ='user'
+    
+    # works as well
+    # class LoansByUser(APIView):
+          
+    # serializer_class = LoanSerializer
+    # permission_classes =[IsAuthenticated]
+    # lookup_field ='owner'
+    # def get(self,request,*args,**kwargs):
+        
+    #     user_pk = self.kwargs['pk']
+    #     try:
+    #         user = User.objects.get(pk=user_pk)
+    #         Loans = Loan.objects.filter(owner=user)
+            
+    #         if not Loans:
+    #             raise ValidationError('User Has No Loans!')
+    #         return Response(list(Loans.values()))
+        
+    #     except User.DoesNotExist:
+            
+    #         return Response({'Error': 'User Not Found!'},
+    #                 status=status.HTTP_404_NOT_FOUND)
+            
+            
+    # # over writing default queryset 
+    # def get_queryset(self):
+    #     # get the wachlist pk
+    #     user_pk = self.kwargs['pk']
+    #     try:
+    #         profile = Profile.objects.filter(user=user_pk)
+    #         if not profile:
+    #             raise ValidationError('User Does Not Exist')
+    #         return profile
+        
+    #     except Profile.DoesNotExist:
+            
+    #         # get_queryset shoud not return a response
+    #         # return Response({'Error': 'Movie Not Found'},status=status.HTTP_404_NOT_FOUND)
+    #         raise ValidationError('User Does Not exist')
+        
+
 
 # class ProfileUpdate(generics.UpdateAPIView):
 #     queryset = Profile.objects.all()
