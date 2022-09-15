@@ -4,16 +4,65 @@ from rest_framework import serializers
 from core.models import *
 from django.db.models import Q, Sum, Avg, Max, Min, Count
 
+User = get_user_model()
 
-class LoanSerializer(serializers.ModelSerializer):
+
+class DeductionSerializer(serializers.ModelSerializer):
+    loan_balance = serializers.SerializerMethodField()
+    loan = serializers.CharField(source='loan.product.name') 
+    loanee = serializers.StringRelatedField()
+    created_by = serializers.StringRelatedField()
+    loan = serializers.StringRelatedField()
+    class Meta:
+        model = Deduction
+        fields = "__all__"
+        
+    def get_loan_balance(self,object):
+        
+        allDeductions = Deduction.objects.filter(pk=object.pk).order_by('transaction_date')
+        
+        totalcredit = allDeductions.aggregate(credit=Sum('credit'))
+                        
+        totaldebit = allDeductions.aggregate(debit=Sum('debit'))
+        credit = totalcredit['credit']
+        debit = totaldebit['debit']
+       
+        if not credit:
+            credit=0
+        if not debit:
+            debit=0            
+                        
+        payments = credit - debit
+        
+        return object.loan.approved_amount - payments
     
-    totaldebt = serializers.SerializerMethodField()
+# Serializer to create and List Loans providing user id on the form
+class LoanListCreateSerializer(serializers.ModelSerializer):
+    
+    created_by = serializers.StringRelatedField()
+    
     
     class Meta:
         model = Loan
         fields = "__all__"
 
-    def get_totaldebt(self,object):
+   
+class LoanSerializer(serializers.ModelSerializer):
+    
+    owner = serializers.StringRelatedField()
+    created_by = serializers.StringRelatedField()
+    
+    total_balance = serializers.SerializerMethodField()
+    totaldeduction = serializers.SerializerMethodField()
+    loan_owner = serializers.SerializerMethodField()
+    product_name = serializers.SerializerMethodField()
+    deductions = DeductionSerializer(many=True,read_only=True)
+    
+    class Meta:
+        model = Loan
+        fields = "__all__"
+
+    def get_total_balance(self,object):
         
         allDeductions = Deduction.objects.filter(loan=object.pk)
         
@@ -31,6 +80,37 @@ class LoanSerializer(serializers.ModelSerializer):
         payments = credit - debit
         
         return object.approved_amount - payments
+    
+    
+    def get_totaldeduction(self,object):
+        
+        allDeductions = Deduction.objects.filter(loan=object.pk)
+        
+        totalcredit = allDeductions.aggregate(credit=Sum('credit'))
+                        
+        totaldebit = allDeductions.aggregate(debit=Sum('debit'))
+        credit = totalcredit['credit']
+        debit = totaldebit['debit']
+       
+        if not credit:
+            credit=0
+        if not debit:
+            debit=0            
+                        
+        return  credit - debit
+        
+        # return object.approved_amount - payments
+    
+    def get_loan_owner(self,object):
+        
+        Owner = User.objects.get(pk=object.owner.pk)
+        return Owner.last_name + ' ' + Owner.first_name
+    
+    def get_product_name(self,object):
+            
+        product = Product.objects.get(pk=object.product.pk)
+        return product.name
+    
     
     
 # class ProductSerializer(serializers.ModelSerializer):
@@ -103,16 +183,7 @@ class MasterLoanDeductionSummarySerializer(serializers.ModelSerializer):
         LoanQueryObj = MasterLoanDeduction.objects.filter(transaction_code=object.transaction_code).first()
         return LoanQueryObj.entry_date
 
-
-class DeductionSerializer(serializers.ModelSerializer):
-    # deductions = LoanSerializer(many=True, read_only=True)
-    loan = serializers.CharField(source='loan.product.name') 
-    loanee = serializers.StringRelatedField()
-    created_by = serializers.StringRelatedField()
-    loan = serializers.StringRelatedField()
-    class Meta:
-        model = Deduction
-        fields = "__all__"
+# deduction serializer
     
 
 # get cumulative loan balances of all active loans
