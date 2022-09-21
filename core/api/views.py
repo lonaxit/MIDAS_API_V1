@@ -139,7 +139,7 @@ class LoanUpload(generics.CreateAPIView):
 # List all loans in the system
 class LoanListCreate(generics.ListCreateAPIView):
     
-    queryset = Loan.objects.all()
+    queryset = Loan.objects.all().order_by('owner')
     serializer_class = LoanListCreateSerializer
     permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
     
