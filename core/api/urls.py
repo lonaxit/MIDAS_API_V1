@@ -18,7 +18,7 @@ urlpatterns =[
     path("product-detail/<int:pk>/", ProductDetail.as_view(), name="product-detail"),
     
     path('loan-upload/', LoanUpload.as_view(),name='loan-upload'),
-    path('loans/', LoanListCreate.as_view(), name='loans-'),
+    path('loans/', LoanListCreate.as_view(), name='loans'),
     path('loan-create/<int:pk>/', LoanCreate.as_view(), name='loan-create'),
     path('<int:pk>/loans/', LoansByUser.as_view(), name='user-loans'),
     path('loan/<int:pk>/', LoanDetail.as_view(), name='loan-detail'),
@@ -79,7 +79,6 @@ urlpatterns =[
     
     # All statement by date range
     path('<str:startdate>/<str:enddate>/allstatement/',allStatementByDate.as_view(),name="statement-by-date"),
-    
     
 
 #   path('loans/',LoanList.as_view(),name='loans'),
