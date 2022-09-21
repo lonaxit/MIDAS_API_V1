@@ -40,11 +40,70 @@ class DeductionSerializer(serializers.ModelSerializer):
 class LoanListCreateSerializer(serializers.ModelSerializer):
     
     created_by = serializers.StringRelatedField()
+    total_balance = serializers.SerializerMethodField()
+    totaldeduction = serializers.SerializerMethodField()
+    loan_owner = serializers.SerializerMethodField()
+    loan_owner_id = serializers.SerializerMethodField()
+    product_name = serializers.SerializerMethodField()
     
     
     class Meta:
         model = Loan
         fields = "__all__"
+    
+    def get_total_balance(self,object):
+            
+        allDeductions = Deduction.objects.filter(loan=object.pk)
+        
+        totalcredit = allDeductions.aggregate(credit=Sum('credit'))
+                        
+        totaldebit = allDeductions.aggregate(debit=Sum('debit'))
+        credit = totalcredit['credit']
+        debit = totaldebit['debit']
+       
+        if not credit:
+            credit=0
+        if not debit:
+            debit=0            
+                        
+        payments = credit - debit
+        
+        return object.approved_amount - payments
+    
+    
+    def get_totaldeduction(self,object):
+        
+        allDeductions = Deduction.objects.filter(loan=object.pk)
+        
+        totalcredit = allDeductions.aggregate(credit=Sum('credit'))
+                        
+        totaldebit = allDeductions.aggregate(debit=Sum('debit'))
+        credit = totalcredit['credit']
+        debit = totaldebit['debit']
+       
+        if not credit:
+            credit=0
+        if not debit:
+            debit=0            
+                        
+        return  credit - debit
+        
+        # return object.approved_amount - payments
+    
+    def get_loan_owner(self,object):
+        
+        Owner = User.objects.get(pk=object.owner.pk)
+        return Owner.last_name + ' ' + Owner.first_name
+    
+    def get_loan_owner_id(self,object):
+            
+        Owner = User.objects.get(pk=object.owner.pk)
+        return Owner.pk
+    
+    def get_product_name(self,object):
+            
+        product = Product.objects.get(pk=object.product.pk)
+        return product.name
 
    
 class LoanSerializer(serializers.ModelSerializer):
@@ -56,6 +115,7 @@ class LoanSerializer(serializers.ModelSerializer):
     totaldeduction = serializers.SerializerMethodField()
     loan_owner = serializers.SerializerMethodField()
     product_name = serializers.SerializerMethodField()
+    loan_owner_id = serializers.SerializerMethodField()
     deductions = DeductionSerializer(many=True,read_only=True)
     
     class Meta:
@@ -105,6 +165,11 @@ class LoanSerializer(serializers.ModelSerializer):
         
         Owner = User.objects.get(pk=object.owner.pk)
         return Owner.last_name + ' ' + Owner.first_name
+    
+    def get_loan_owner_id(self,object):
+            
+        Owner = User.objects.get(pk=object.owner.pk)
+        return Owner.pk
     
     def get_product_name(self,object):
             
