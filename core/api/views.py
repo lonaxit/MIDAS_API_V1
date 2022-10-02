@@ -528,14 +528,14 @@ class DeductionCreate(generics.CreateAPIView):
     def get_queryset(self):
         return Deduction.objects.all()
     
-    def perform_create(self, request,serializer):
+    def perform_create(self,serializer):
         
         pk = self.kwargs.get('loan_pk')
         try:
              loanObj = Loan.objects.get(pk=pk)
              user = loanObj.owner
              
-             serializer.save(loanee=user,loan=loanObj,created_by=request.user)
+             serializer.save(loanee=user,loan=loanObj,created_by=self.request.user)
              
         except Loan.DoesNotExist:
             
