@@ -19,22 +19,61 @@ class DeductionSerializer(serializers.ModelSerializer):
         
     def get_loan_balance(self,object):
         
-        allDeductions = Deduction.objects.filter(pk=object.pk).order_by('transaction_date')
         
-        totalcredit = allDeductions.aggregate(credit=Sum('credit'))
-                        
-        totaldebit = allDeductions.aggregate(debit=Sum('debit'))
+        allDeductions = Deduction.objects.filter(Q(transaction_date = object.transaction_date) & Q(loan=object.loan.pk))
+        
+        if (allDeductions.count() > 1):
+            # select records greater than this date
+            GreaterDeductions = Deduction.objects.filter(Q(transaction_date__gt=object.transaction_date) & Q(loan=object.loan.pk))
+            
+            totalcredit = GreaterDeductions.aggregate(credit=Sum('credit'))
+                            
+            totaldebit = GreaterDeductions.aggregate(debit=Sum('debit'))
+            Greatercredit = totalcredit['credit']
+            Greaterdebit = totaldebit['debit']
+        
+            if not Greatercredit:
+                Greatercredit=0
+            if not Greaterdebit:
+                Greaterdebit=0 
+            
+            Deductions = Deduction.objects.filter(Q(transaction_date=object.transaction_date) & Q(loan=object.loan.pk) & Q(pk__lte=object.pk))
+    
+        
+            totalcredit = Deductions.aggregate(credit=Sum('credit'))
+                            
+            totaldebit = Deductions.aggregate(debit=Sum('debit'))
+            credit = totalcredit['credit']
+            debit = totaldebit['debit']
+        
+            if not credit:
+                credit=0
+            if not debit:
+                debit=0            
+                            
+            payments = credit + Greatercredit - debit+Greaterdebit
+        
+            return object.loan.approved_amount-payments
+            
+        
+        all_Deductions = Deduction.objects.filter(Q(transaction_date__gte= object.transaction_date) & Q(loan=object.loan.pk))
+        
+        totalcredit = all_Deductions.aggregate(credit=Sum('credit'))
+                            
+        totaldebit = all_Deductions.aggregate(debit=Sum('debit'))
         credit = totalcredit['credit']
         debit = totaldebit['debit']
-       
+        
         if not credit:
             credit=0
         if not debit:
             debit=0            
-                        
+                            
         payments = credit - debit
         
-        return object.loan.approved_amount - payments
+        return object.loan.approved_amount-payments
+        
+        
     
 # Serializer to create and List Loans providing user id on the form
 class LoanListCreateSerializer(serializers.ModelSerializer):
