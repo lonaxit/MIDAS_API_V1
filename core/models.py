@@ -108,8 +108,15 @@ class Deduction(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     
+    class Meta:
+        
+        
+         ordering = ['-transaction_date']
+        # get_latest_by = "transaction_date"
+    
     def __str__(self):
         return self.description
+        
     
     
 class SavingMaster(models.Model):
