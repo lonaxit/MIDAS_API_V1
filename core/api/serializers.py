@@ -13,9 +13,13 @@ class DeductionSerializer(serializers.ModelSerializer):
     loanee = serializers.StringRelatedField()
     created_by = serializers.StringRelatedField()
     loan = serializers.StringRelatedField()
+    loan_id = serializers.SerializerMethodField()
     class Meta:
         model = Deduction
         fields = "__all__"
+        
+    def get_loan_id(self,object):
+        return object.loan.pk
         
     def get_loan_balance(self,object):
         
@@ -294,13 +298,18 @@ class MasterLoanDeductionSummarySerializer(serializers.ModelSerializer):
 class AllLoanBalancesByDateSerializer(serializers.ModelSerializer):
     
     balance = serializers.SerializerMethodField()
+    loan_owner = serializers.SerializerMethodField()
     
     class Meta:
         model = Loan
         # fields ="__all__"
-        fields  = ('id', 'owner','balance')
+        fields  = ('id', 'owner','balance','loan_owner')
         
-        
+    def get_loan_owner(self,object):
+            
+        Owner = User.objects.get(pk=object.owner.pk)
+        return Owner.last_name + ' ' + Owner.first_name
+       
     def get_balance(self,object):
         
         start_date = self.context['startdate']
