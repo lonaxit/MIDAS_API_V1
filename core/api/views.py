@@ -5,6 +5,7 @@ import string
 import io, csv, pandas as pd
 from core.api.serializers import *
 from core.api.permissions import *
+from core.api.utilities import *
 # # import models
 from core.models import *
 from django.contrib.auth import get_user_model
@@ -399,9 +400,9 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
         
         # get all active master deduction records
         masterDeductions= MasterLoanDeduction.objects.filter(active=True)
-        # get all active loans
-        # activeLoans = Loan.objects.exclude(active=False)
         
+        # get all active loans
+       
         activeLoans = Loan.objects.filter(active=True)
         
         allDeductions = Deduction.objects.filter(loan__active=True)
@@ -412,28 +413,31 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                 
                 try:
                     
+                    ippis_Deduction = master.cumulative_amount
+                    
                     profile = Profile.objects.get(ippis=master.ippis_number)
                     
                     # get all active loans for a user
                     myLoans = activeLoans.filter(owner=profile.user)
                     
-                    # get total repayment
-                    # sumRepayment = myLoans.aggregate(repayment=Sum('monthly_deduction'))
+                    # total Monthly Deduction
+                    total_MonthlyDedcution = activeLoans.aggregate(totalMonthlyDeduction=Sum('monthly_deduction'))
                     
-                    # totalRepayment =sumRepayment['repayment']
+                    monthlyDeduction = total_MonthlyDedcution['totalMonthlyDeduction']
+                    
+                    
+                    if ippis_Deduction > monthlyDeduction:
+                        continue
+                    
                     
                     userDeductions = allDeductions.filter(loanee=profile.user)
                     
-                    ippis_Deduction = master.cumulative_amount
-                    
-                    # no = 0
+                
                     for singleLoan in myLoans:
-                        # n=1
+               
                         # get principal loan amount
                         loanPrincipal  = singleLoan.approved_amount
-                        
-                        # get loan balance from balance summary table
-                        
+                           
                         totalcredit = userDeductions.filter(loan=singleLoan).aggregate(credit=Sum('credit'))
                         
                         totaldebit = userDeductions.filter(loan=singleLoan).aggregate(debit=Sum('debit'))
@@ -451,11 +455,8 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                         # balance
                         bal = loanPrincipal-payments
                         
-                        
                         if(bal and bal <= singleLoan.monthly_deduction):
                             ippis_Deduction = ippis_Deduction-bal
-                            
-                           
                             
                             Deduction.objects.create(  
                                     loanee=profile.user,
@@ -466,21 +467,13 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                                     transaction_code = master.transaction_code,
                                     created_by=request.user,
                                     )
-                            # store the balance in loanbalance table
-                            # Loanbalance.objects.create(  
-                            #         loanee=profile.user,
-                            #         loan= singleLoan,
-                            #         current_blance = bal-bal,
-                            #         narration = master.narration,
-                            #         transaction_date = master.entry_date,
-                            #         transaction_code = master.transaction_code,
-                            #         created_by=request.user,
-                            #         )
+                            deactivateLoan(singleLoan)
+                            
+                           
                             
                         elif(bal and bal > ippis_Deduction):
                             ippis_Deduction = ippis_Deduction-singleLoan.monthly_deduction
                           
-                            
                             Deduction.objects.create(  
                                     loanee=profile.user,
                                     loan= singleLoan,
@@ -490,16 +483,17 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                                     transaction_code = master.transaction_code,
                                     created_by=request.user,
                                     )
-                            # caculate the balance of the loan and store in loanbalance table
-                        # elif(ippis_Deduction > bal):
-                        #     continue
+                            deactivateLoan(singleLoan)
+                         
+                        elif(ippis_Deduction > bal):
+                           continue
                         
                         
                     # update the master record to inactive
                     master.active = False
                     master.save()
                             
-                            # n+=1
+               
                     
                 # except Profile.DoesNotExist:
                 #     continue
@@ -819,7 +813,9 @@ class allStatementByDate(generics.ListAPIView):
 
             raise ValidationError('User Does Not exist')
         
-        
+
+
+
           
 # import io, csv, pandas as pd
 # class UploadFileView(generics.CreateAPIView):
