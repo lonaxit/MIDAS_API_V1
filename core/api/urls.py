@@ -52,7 +52,6 @@ urlpatterns =[
     
     path('loan-statement/<int:userid>/<str:startdate>/<str:enddate>/',LoanStatement.as_view(), name="loan-statement"),
     
-    
     # Master Savings URL
     path('mastersaving/upload/',MasterSavingUpload.as_view(), name="upload-mastersaving-deduction"),
     
