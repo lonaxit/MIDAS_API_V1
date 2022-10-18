@@ -159,6 +159,9 @@ class LoanSerializer(serializers.ModelSerializer):
     loan_owner = serializers.SerializerMethodField()
     product_name = serializers.SerializerMethodField()
     loan_owner_id = serializers.SerializerMethodField()
+    totalCredit =serializers.SerializerMethodField()
+    totalDebit =serializers.SerializerMethodField()
+  
     deductions = DeductionSerializer(many=True,read_only=True)
     
     class Meta:
@@ -219,6 +222,24 @@ class LoanSerializer(serializers.ModelSerializer):
         product = Product.objects.get(pk=object.product.pk)
         return product.name
     
+    def get_totalCredit(self,obj):
+            
+        credit = Deduction.objects.filter(loan=obj.pk).aggregate(credit=Sum('credit'))
+        credit = credit['credit']
+        if not credit:
+            credit=0
+            
+        return credit
+    
+    def get_totalDebit(self,obj):
+            
+        debit = Deduction.objects.filter(loan=obj.pk).aggregate(debit=Sum('debit'))
+        
+        debit = debit['debit']
+        if not debit:
+            debit=0
+            
+        return debit
     
     
 # class ProductSerializer(serializers.ModelSerializer):
@@ -346,17 +367,23 @@ class IndividualLoanBalanceSerializer(serializers.ModelSerializer):
     totalCredit =serializers.SerializerMethodField()
     totalDebit =serializers.SerializerMethodField()
     balance =serializers.SerializerMethodField()
+    product_name = serializers.SerializerMethodField()
+    
     
     class Meta:
         model = Loan
       
-        fields  = ('id', 'product','owner','deductions','principal','totalCredit','totalDebit','balance')
+        fields  = ('id', 'product','owner','deductions','principal','totalCredit','totalDebit','balance','approved_amount','monthly_deduction','start_date','end_date','product_name')
         
     def get_deductions(self,object):
         
         allDeductions = Deduction.objects.filter(loan=object.pk).values()
         
         return allDeductions
+    def get_product_name(self,object):
+            
+        product = Product.objects.get(pk=object.product.pk)
+        return product.name
     
     def get_principal(self,object):
         
