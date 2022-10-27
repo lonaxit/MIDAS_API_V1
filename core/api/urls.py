@@ -79,16 +79,8 @@ urlpatterns =[
     # All statement by date range
     path('<str:startdate>/<str:enddate>/allstatement/',allStatementByDate.as_view(),name="statement-by-date"),
     
+     # User Opening Balance 
+    path('<int:pk>/<str:startdate>/deposit-opening/balance/',UserOpeningBalance.as_view(),name="deposit=opening-balance"),
+    
 
-#   path('loans/',LoanList.as_view(),name='loans'),
-#   path('<int:pk>/loans/', LoansByProduct.as_view(), name="product-loans"),
-#   path('loan/<int:pk>/', LoanDetail.as_view(),name='loan-detail'),
-# #   
-    
-    # ***************************************************
-    
-    # path("ebooks/<int:pk>/", EbookDetailAPIView.as_view(), name="ebook-detail"),
-    # path("ebooks/<int:ebook_pk>/review/", ReviewCreateAPIView.as_view(), name="ebook-review"),
-    # path("reviews/<int:pk>/", ReviewDetailAPIView.as_view(), name="review-detail"),
-    # # path("journalists/", JournalistCreateListAPIView.as_view(), name="journalist-list"),
 ]
