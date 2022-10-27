@@ -5,16 +5,73 @@ from core.models  import Profile
 
 # IMPORT CUSTOM USER
 from django.contrib.auth import get_user_model
+from core.api.serializers import *
 User = get_user_model()
 
 # user app
 class UserSerializer(serializers.ModelSerializer):
     
-    # profile = serializers.SerializerMethodField()
+    savinguser = SavingSerializer(many=True,read_only=True)
+    
+    totalSaving = serializers.SerializerMethodField()
+    # balance = serializers.SerializerMethodField()
     
     class Meta:
         model = User
-        fields = ('id','username','first_name','last_name','other_name','is_employee','is_account','is_normal','is_active','date_joined')
+        fields = ('id','username','first_name','last_name','other_name','is_employee','is_account','is_normal','is_active','date_joined','savinguser','totalSaving')
+        
+    
+    
+    def get_totalSaving(self,object):
+            
+        totalCredit = Saving.objects.filter(user=object.pk).aggregate(credit=Sum('credit'))
+        
+        totalDebit = Saving.objects.filter(user=object.pk).aggregate(debit=Sum('debit'))
+        
+    
+        credit = totalCredit['credit']
+        debit = totalDebit['debit']
+       
+        if not credit:
+            credit=0
+        if not debit:
+            debit=0            
+                        
+        payments = credit - debit
+        
+        return payments
+    
+
+class UserOpeningBalanceSerializer(serializers.ModelSerializer):
+    
+    openingBalance = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = User
+        fields = ('id','username','first_name','last_name','other_name','is_employee','openingBalance')
+        
+    def get_openingBalance(self,object):
+        start_date = self.context['startdate']
+        
+        allSavings = Saving.objects.filter(user=object.pk,transaction_date__lt=start_date)
+    
+        totalCredit = allSavings.aggregate(credit=Sum('credit'))
+        
+        totalDebit = allSavings.aggregate(debit=Sum('debit'))
+        
+    
+        credit = totalCredit['credit']
+        debit = totalDebit['debit']
+       
+        if not credit:
+            credit=0
+        if not debit:
+            debit=0            
+                        
+        payments = credit - debit
+        
+        
+        return payments
         
 # 
 class UpdateUserPasswordSerializer(serializers.ModelSerializer):
