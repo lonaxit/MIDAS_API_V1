@@ -511,13 +511,95 @@ class SavingMasterSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class SavingSerializer(serializers.ModelSerializer):
-    # deductions = LoanSerializer(many=True, read_only=True)
+
     user = serializers.StringRelatedField()
     created_by = serializers.StringRelatedField()
+    user_id = serializers.SerializerMethodField()
+    totalCredit = serializers.SerializerMethodField()
+    balance =serializers.SerializerMethodField()
 
     class Meta:
         model = Saving
-        fields = "__all__"  
+        fields = "__all__" 
+         
+    def get_balance(self,object):
+        
+        
+        allDeductions = Saving.objects.filter(Q(transaction_date = object.transaction_date) & Q(user=object.user.pk))
+        
+        if (allDeductions.count() > 1):
+            # select records greater than this date
+            GreaterDeductions = Saving.objects.filter(Q(transaction_date__gt=object.transaction_date) & Q(user=object.user.pk))
+            
+            totalcredit = GreaterDeductions.aggregate(credit=Sum('credit'))
+                            
+            totaldebit = GreaterDeductions.aggregate(debit=Sum('debit'))
+            Greatercredit = totalcredit['credit']
+            Greaterdebit = totaldebit['debit']
+        
+            if not Greatercredit:
+                Greatercredit=0
+            if not Greaterdebit:
+                Greaterdebit=0 
+            
+            Deductions = Saving.objects.filter(Q(transaction_date=object.transaction_date) & Q(user=object.user.pk) & Q(pk__lte=object.pk))
+    
+        
+            totalcredit = Deductions.aggregate(credit=Sum('credit'))
+                            
+            totaldebit = Deductions.aggregate(debit=Sum('debit'))
+            credit = totalcredit['credit']
+            debit = totaldebit['debit']
+        
+            if not credit:
+                credit=0
+            if not debit:
+                debit=0            
+                            
+            payments = credit + Greatercredit - debit+Greaterdebit
+        
+            return payments
+            
+        
+        all_Deductions = Saving.objects.filter(Q(transaction_date__gte= object.transaction_date) & Q(user=object.user.pk))
+        
+        totalcredit = all_Deductions.aggregate(credit=Sum('credit'))
+                            
+        totaldebit = all_Deductions.aggregate(debit=Sum('debit'))
+        credit = totalcredit['credit']
+        debit = totaldebit['debit']
+        
+        if not credit:
+            credit=0
+        if not debit:
+            debit=0            
+                            
+        payments = credit - debit
+        
+        return payments
+      
+    def get_user_id(self,object):
+        Owner = User.objects.get(pk=object.user.pk)
+        return Owner.id
+    
+    def get_totalCredit(self,object):
+        
+        totalCredit = Saving.objects.filter(user=object.user.pk).aggregate(credit=Sum('credit'))
+        
+        totalDebit = Saving.objects.filter(user=object.user.pk).aggregate(debit=Sum('debit'))
+        
+    
+        credit = totalCredit['credit']
+        debit = totalDebit['debit']
+       
+        if not credit:
+            credit=0
+        if not debit:
+            debit=0            
+                        
+        payments = credit - debit
+        
+        return payments
     
 # ******************************* 
 # class FileUploadSerializer(serializers.Serializer):
