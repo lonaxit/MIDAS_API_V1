@@ -137,14 +137,18 @@ class SavingMaster(models.Model):
     
 class Saving(models.Model):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING,related_name='savinguser')
-    credit = models.DecimalField(max_digits=20,decimal_places=2,default="0.00")
-    debit = models.DecimalField(max_digits=20,decimal_places=2,default="0.00")
+    credit = models.DecimalField(max_digits=20,decimal_places=2,null=True,blank=True)
+    debit = models.DecimalField(max_digits=20,decimal_places=2,null=True,blank=True)
     transaction_code = models.BigIntegerField()
     transaction_date = models.DateField()
     narration = models.CharField(max_length=350)
     created_by = models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name='savingcreatedby')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        
+        ordering = ['-transaction_date']
     
     def __str__(self):
         return self.user.last_name
