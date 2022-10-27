@@ -3,6 +3,7 @@ import random
 import string
 
 import io, csv, pandas as pd
+from users.serializers import *
 from core.api.serializers import *
 from core.api.permissions import *
 from core.api.utilities import *
@@ -788,6 +789,27 @@ class StatementofSavings(generics.ListAPIView):
         except User.DoesNotExist:          
 
             raise ValidationError('User Does Not exist')
+
+# find saving opening balance for user by date
+
+class UserOpeningBalance(generics.RetrieveAPIView):
+    
+    serializer_class = UserOpeningBalanceSerializer
+    permission_classes= [IsAuthenticated & IsAuthOrReadOnly]
+    
+    def get_queryset(self):
+        
+       return User.objects.all()
+       
+    
+    def get_serializer_context(self):
+        startDate = self.kwargs.get('startdate')
+        
+        context = {'startdate':startDate}
+        
+        return context
+    
+  
         
 
 #  find statement of saving date range start and end dates 
