@@ -1,3 +1,4 @@
+from email.policy import default
 from django.db import models
 
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -10,17 +11,17 @@ class Profile(models.Model):
     user= models.OneToOneField(User,on_delete=models.CASCADE)
     ippis = models.BigIntegerField(null=True, blank=True)
     home_address = models.CharField(max_length=350, null=True,blank=True)
-    dob = models.DateField()
-    employment_type = models.CharField(max_length=100, null=True,blank=True)
-    job_cadre = models.CharField(max_length=100,null=True,blank=True)
-    phone = models.CharField(max_length=20,null=True,blank=True)
-    email = models.EmailField(null=True, blank=True,null=True,blank=True)
-    marital_status = models.CharField(max_length=25, null=True,blank=True)
-    nok_fullName = models.CharField(max_length=200,null=True,blank=True)
-    nok_phone = models.CharField(max_length=25, null=True,blank=True)
-    nok_relationship = models.CharField(max_length=50, null=True,blank=True)
-    bank = models.CharField(max_length=50, null=True,blank=True)
-    bank_account= models.CharField(max_length=20, null=True,blank=True)
+    #dob = models.DateField(default="2021-02-01")
+    # employment_type = models.CharField(max_length=100, null=True,blank=True)
+    # job_cadre = models.CharField(max_length=100,null=True,blank=True)
+    # phone = models.CharField(max_length=20,null=True,blank=True)
+    # email = models.EmailField(null=True, blank=True)
+    # marital_status = models.CharField(max_length=25, null=True,blank=True)
+    # nok_fullName = models.CharField(max_length=200,null=True,blank=True)
+    # nok_phone = models.CharField(max_length=25, null=True,blank=True)
+    # nok_relationship = models.CharField(max_length=50, null=True,blank=True)
+    # bank = models.CharField(max_length=50, null=True,blank=True)
+    # bank_account= models.CharField(max_length=20, null=True,blank=True)
     avatar = models.ImageField(null=True,blank=True)
     
     
