@@ -112,7 +112,23 @@ class RetrieveUserView(APIView):
                 {'user':user.data},
                 status= status.HTTP_200_OK
             )
-       
+ 
+#  get logged in user info
+    
+class GetUserWithUsername(APIView):
+    
+    permission_classes = [IsAuthenticated,IsAuthOrReadOnly]
+    
+    def get(self,request,username):
+        
+        # try:
+        user = User.objects.get(username=username)
+        # user = request.user
+        user = UserSerializer(user)
+        return Response(
+                {'user':user.data},
+                status= status.HTTP_200_OK
+            )      
             
 
 class retrieveAllUsers(APIView):
