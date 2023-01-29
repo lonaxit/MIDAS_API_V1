@@ -12,6 +12,7 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     
     savinguser = SavingSerializer(many=True,read_only=True)
+    # loanowner = LoanSerializer(many=True,read_only=True)
     
     totalSaving = serializers.SerializerMethodField()
     # balance = serializers.SerializerMethodField()
