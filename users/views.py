@@ -30,15 +30,22 @@ class RegistrationView(APIView):
             data = request.data
             first_name = data['first_name']
             last_name = data['last_name']
+            ippis_number = data['ippis_number']
+            dob = data['dob']
+            dofa = data['dofa']
             username = data['username']
             password = data['password']
             re_password = data['re_password']
-            # is_employee = data['is_employee']
+            is_employee = data['is_employee']
             
-            # if is_employee=='True':
-            #     is_employee=True
-            # else:
-            #     is_employee=False
+            
+            if is_employee == True:
+                is_employee=True
+            
+            else:
+                is_employee=False
+               
+                
             if not password:
                  return Response(
                         {'msg':'Fill the records'},
@@ -50,27 +57,32 @@ class RegistrationView(APIView):
                     
                     if not User.objects.filter(username=username).exists():
                         
-                         User.objects.create_user(first_name=first_name,last_name=last_name,username=username,password=password)
+                        
+                        #  User.objects.create_user(first_name=first_name,last_name=last_name,username=username,password=password,ippis_number=ippis_number,dob=dob,dofa=dofa)
                             
-                         return Response(
-                            {'msg':'User created successfuly'},
+                        #  return Response(
+                        #     {'msg':'User created successfuly'},
+                        #     status = status.HTTP_201_CREATED
+                        #     )
+                        
+                        if not is_employee:
+                            
+                            User.objects.create_user(first_name=first_name,last_name=last_name,username=username,password=password,ippis_number=ippis_number,dob=dob,dofa=dofa)
+                            
+                            return Response(
+                            {'success':'User created successfuly'},
                             status = status.HTTP_201_CREATED
                             )
+                    
                         
-                        # if not is_employee:
-                        #     User.objects.create_user(first_name=first_name,last_name=last_name,username=username,password=password)
+                        else:
+                           
+                            User.objects.create_employee(first_name=first_name,last_name=last_name,username=username,password=password,ippis_number=ippis_number,dob=dob,dofa=dofa)
                             
-                        #     return Response(
-                        #     {'success':'User created successfuly'},
-                        #     status = status.HTTP_201_CREATED
-                        #     )
-                        # else:
-                        #     User.objects.create_employee(first_name=first_name,last_name=last_name,username=username,password=password)
-                            
-                        #     return Response(
-                        #     {'success':'Employee created successfuly'},
-                        #     status = status.HTTP_201_CREATED
-                        #     )
+                            return Response(
+                            {'success':'Employee created successfuly'},
+                            status = status.HTTP_201_CREATED
+                            )
                             
                     else:
                         
