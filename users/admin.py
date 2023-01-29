@@ -9,14 +9,14 @@ from .models import CustomUser
 class CustomUserAdmin(UserAdmin):
     
     model = CustomUser
-    list_display = ['first_name','last_name','username','is_staff','is_account','is_employee','is_normal']
+    list_display = ['first_name','last_name','username','ippis_number','dob','dofa','is_staff','is_account','is_employee','is_normal']
     
     fieldsets = (
         (None, {
             'fields': ('username', 'password')
         }),
         ('Personal info', {
-            'fields': ('first_name', 'last_name')
+            'fields': ('first_name', 'last_name','ippis_number','dob','dofa')
         }),
         ('Permissions', {
             'fields': (
@@ -37,7 +37,7 @@ class CustomUserAdmin(UserAdmin):
             'fields': ('username', 'password1', 'password2')
         }),
         ('Personal info', {
-            'fields': ('first_name', 'last_name')
+            'fields': ('first_name', 'last_name','ippis_number','dob','dofa')
         }),
         ('Permissions', {
             'fields': (
