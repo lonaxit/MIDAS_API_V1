@@ -57,7 +57,7 @@ class IsAuthOrReadOnly(permissions.BasePermission):
         
         if request.method in permissions.SAFE_METHODS:
             return True
-        if(request.user.is_employee or request.user.is_account):
+        if(request.user.is_employee or request.user.is_account or request.user.is_staff):
             return True
      
     
