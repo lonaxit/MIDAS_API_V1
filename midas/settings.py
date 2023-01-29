@@ -119,7 +119,11 @@ WSGI_APPLICATION = 'midas.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME':'midas_api',
+        # 'NAME':'midas_api',
+        # 'USER': 'postgres',
+        # 'PASSWORD':'2021_lonax',
+        
+        'NAME':'midas_production_db',
         'USER': 'postgres',
         'PASSWORD':'2021_lonax',
         'HOST':'localhost',
