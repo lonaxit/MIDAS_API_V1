@@ -21,7 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         # fields = '__all__'
         # fields = ('id','username','first_name','last_name','other_name','is_employee','is_account','is_normal','is_active','date_joined','savinguser','totalSaving')
-        exclude=('groups','user_permissions','date_joined','last_login','password')
+        exclude=('groups','user_permissions','last_login','password')
         
     
     
