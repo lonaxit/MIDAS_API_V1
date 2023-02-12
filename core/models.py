@@ -9,12 +9,11 @@ User = get_user_model()
 
 class Profile(models.Model):
     user= models.OneToOneField(User,on_delete=models.CASCADE)
-    ippis = models.BigIntegerField(null=True, blank=True)
+    staff_id = models.BigIntegerField(null=True, blank=True)
     home_address = models.CharField(max_length=500, null=True,blank=True)
-    dob = models.DateField(blank=True,null=True)
+    dept = models.CharField(max_length=500, null=True,blank=True)
     gender = models.CharField(max_length=10,null=True,blank=True)
     employment_type = models.CharField(max_length=100, null=True,blank=True)
-    employment_date = models.DateField(blank=True,null=True)
     job_cadre = models.CharField(max_length=100,null=True,blank=True)
     phone = models.CharField(max_length=20,null=True,blank=True)
     email = models.EmailField(null=True, blank=True)
@@ -24,7 +23,7 @@ class Profile(models.Model):
     nok_relationship = models.CharField(max_length=50, null=True,blank=True)
     bank = models.CharField(max_length=50, null=True,blank=True)
     bank_account= models.CharField(max_length=20, null=True,blank=True)
-    avatar = models.ImageField(null=True,blank=True)
+ 
     
     
     def __str__(self):
