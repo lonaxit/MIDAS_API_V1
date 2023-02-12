@@ -7,7 +7,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 
 class CustomUserManager(BaseUserManager):
     
-    def create_user(self, first_name,last_name,username,ippis_number,dob,dofa,password=None):
+    def create_user(self, first_name,last_name,other_name,username,ippis_number,dob,dofa,password=None):
         
         if not username:
             raise ValueError('User must have a username and must be unique')
@@ -30,6 +30,7 @@ class CustomUserManager(BaseUserManager):
             username=username,
             first_name=first_name,
             last_name = last_name,
+            other_name=other_name,
             ippis_number = ippis_number,
             dob = dob,
             dofa=dofa
@@ -43,29 +44,29 @@ class CustomUserManager(BaseUserManager):
         return user
 
     # method to create other roles
-    def create_employee(self, first_name,last_name,username, ippis_number,dob,dofa,password=None):
-        user = self.create_user(first_name,last_name,username,ippis_number,dob,dofa,password)
+    def create_employee(self, first_name,last_name,other_name,username, ippis_number,dob,dofa,password=None):
+        user = self.create_user(first_name,last_name,other_name,username,ippis_number,dob,dofa,password)
         user.is_employee=True
         user.save()
         
         return user
     
-    def create_account(self, first_name,last_name,username,ippis_number,dob,dofa,password=None):
-        user = self.create_user(first_name,last_name,username,ippis_number,dob,dofa,password)
+    def create_account(self, first_name,last_name,other_name,username,ippis_number,dob,dofa,password=None):
+        user = self.create_user(first_name,last_name,other_name,username,ippis_number,dob,dofa,password)
         user.is_account=True
         user.save()
         
         return user
     
-    def create_normal(self, first_name,last_name,username,ippis_number,dob,dofa,password=None):
-        user = self.create_user(first_name,last_name,username,ippis_number,dob,dofa,password)
+    def create_normal(self, first_name,last_name,other_name,username,ippis_number,dob,dofa,password=None):
+        user = self.create_user(first_name,last_name,other_name,username,ippis_number,dob,dofa,password)
         user.is_normal=True
         user.save()
         
         return user
     
-    def create_superuser(self, first_name,last_name,username,ippis_number,dob,dofa,password=None):
-        user = self.create_user(first_name,last_name,username,ippis_number,dob,dofa,password)
+    def create_superuser(self, first_name,last_name,other_name,username,ippis_number,dob,dofa,password=None):
+        user = self.create_user(first_name,last_name,other_name,username,ippis_number,dob,dofa,password)
       
         user.is_superuser = True
         user.is_staff =True
@@ -82,19 +83,7 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
     ippis_number = models.BigIntegerField(default=0000000)
     dob = models.DateField(default="2000-01-02")
     dofa = models.DateField(default="2000-01-02")
-    # employment_type = models.CharField(max_length=100, null=True,blank=True)
-    
-    # home_address = models.CharField(max_length=500, null=True,blank=True)
-    # gender = models.CharField(max_length=20, null=True,blank=True)
-    # job_cadre = models.CharField(max_length=100,null=True,blank=True)
-    # phone = models.CharField(max_length=20,null=True,blank=True)
-    # email = models.EmailField(null=True, blank=True)
-    # marital_status = models.CharField(max_length=25, null=True,blank=True)
-    # nok_fullName = models.CharField(max_length=200,null=True,blank=True)
-    # nok_phone = models.CharField(max_length=25, null=True,blank=True)
-    # nok_relationship = models.CharField(max_length=50, null=True,blank=True)
-    # bank = models.CharField(max_length=50, null=True,blank=True)
-    # bank_account= models.CharField(max_length=20, null=True,blank=True)
+   
     avatar = models.ImageField(null=True,blank=True)
     date_joined = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=True)
