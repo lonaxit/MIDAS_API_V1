@@ -8,7 +8,7 @@ urlpatterns=[
     path('all/users/',retrieveAllUsers.as_view(), name="all-users"),
     path('<int:pk>/user-update/',UpdateUser.as_view(), name="update-user"),
     
-    # change password using userid
+    # change login detail using userid
     path('<int:pk>/update-password/',UpdateUserPassword.as_view(), name="update-password"),
     
     # Change password using username
