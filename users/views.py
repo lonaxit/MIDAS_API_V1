@@ -30,6 +30,7 @@ class RegistrationView(APIView):
             data = request.data
             first_name = data['first_name']
             last_name = data['last_name']
+            other_name = data['other_name']
             ippis_number = data['ippis_number']
             dob = data['dob']
             dofa = data['dofa']
@@ -44,7 +45,6 @@ class RegistrationView(APIView):
             
             else:
                 is_employee=False
-               
                 
             if not password:
                  return Response(
@@ -67,7 +67,7 @@ class RegistrationView(APIView):
                         
                         if not is_employee:
                             
-                            User.objects.create_user(first_name=first_name,last_name=last_name,username=username,password=password,ippis_number=ippis_number,dob=dob,dofa=dofa)
+                            user = User.objects.create_user(first_name=first_name,last_name=last_name,other_name=other_name,username=username,password=password,ippis_number=ippis_number,dob=dob,dofa=dofa)
                             
                             return Response(
                             {'success':'User created successfuly'},
@@ -77,7 +77,7 @@ class RegistrationView(APIView):
                         
                         else:
                            
-                            User.objects.create_employee(first_name=first_name,last_name=last_name,username=username,password=password,ippis_number=ippis_number,dob=dob,dofa=dofa)
+                            User.objects.create_employee(first_name=first_name,last_name=last_name,other_name=other_name,username=username,password=password,ippis_number=ippis_number,dob=dob,dofa=dofa)
                             
                             return Response(
                             {'success':'Employee created successfuly'},
@@ -167,10 +167,11 @@ class UpdateUser(generics.RetrieveUpdateAPIView):
     permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
     
 
-# Update password for user given a user id
+# Update user login details given a user id
 class UpdateUserPassword(APIView):
     
-    permission_classes=[IsAuthenticated & IsAuthOrReadOnly]
+    permission_classes=[IsAuthenticated]
+    # permission_classes=[IsAuthenticated & IsAuthOrReadOnly]
     # throttle_classes= [AnonRateThrottle]
     
     # def get(self,request,pk):
@@ -190,9 +191,12 @@ class UpdateUserPassword(APIView):
     
     def put(self,request,pk):
         
-        
+        # do not changec username
         user = User.objects.get(pk=pk)
         password = make_password(request.data['password'])
+        # user_name = request.data['username']
+        # user.username =user_name
+        
         user.password = password
         user.save()
         return Response('Password Reset Successful!')
