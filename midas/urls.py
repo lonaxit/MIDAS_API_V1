@@ -9,14 +9,14 @@ urlpatterns = [
     path('api/v1/',include('djoser.urls.authtoken')),
     path('api/v1/',include('core.api.urls')),
     
-    # custom registration app
+    #custom registration app
      path('auth/', include('users.urls')),
      path('api/v1/',include('profiles.api.urls')),
      path('api/v1/',include('cooperators.api.urls')),
      
-    #  documentation
+    #documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    # Optional UI:
+    #Optional UI:
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]
