@@ -7,7 +7,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 
 class CustomUserManager(BaseUserManager):
     
-    def create_user(self, first_name,last_name,other_name,username,ippis_number,dob,dofa,password=None):
+    def create_user(self, first_name,last_name,username,ippis_number,dob,dofa,other_name=None,password=None):
         
         if not username:
             raise ValueError('User must have a username and must be unique')
@@ -44,29 +44,29 @@ class CustomUserManager(BaseUserManager):
         return user
 
     # method to create other roles
-    def create_employee(self, first_name,last_name,other_name,username, ippis_number,dob,dofa,password=None):
-        user = self.create_user(first_name,last_name,other_name,username,ippis_number,dob,dofa,password)
+    def create_employee(self, first_name,last_name,username,ippis_number,dob,dofa,other_name=None,password=None):
+        user = self.create_user(first_name,last_name,username,ippis_number,dob,dofa,other_name,password)
         user.is_employee=True
         user.save()
         
         return user
     
-    def create_account(self, first_name,last_name,other_name,username,ippis_number,dob,dofa,password=None):
-        user = self.create_user(first_name,last_name,other_name,username,ippis_number,dob,dofa,password)
+    def create_account(self, first_name,last_name,username,ippis_number,dob,dofa,other_name=None,password=None):
+        user = self.create_user(first_name,last_name,username,ippis_number,dob,dofa,other_name,password)
         user.is_account=True
         user.save()
         
         return user
     
-    def create_normal(self, first_name,last_name,other_name,username,ippis_number,dob,dofa,password=None):
-        user = self.create_user(first_name,last_name,other_name,username,ippis_number,dob,dofa,password)
+    def create_normal(self, first_name,last_name,username,ippis_number,dob,dofa,other_name=None,password=None):
+        user = self.create_user(first_name,last_name,username,ippis_number,dob,dofa,other_name,password)
         user.is_normal=True
         user.save()
         
         return user
     
-    def create_superuser(self, first_name,last_name,other_name,username,ippis_number,dob,dofa,password=None):
-        user = self.create_user(first_name,last_name,other_name,username,ippis_number,dob,dofa,password)
+    def create_superuser(self, first_name,last_name,username,ippis_number,dob,dofa,other_name=None,password=None):
+        user = self.create_user(first_name,last_name,username,ippis_number,dob,dofa,other_name,password)
       
         user.is_superuser = True
         user.is_staff =True
@@ -79,7 +79,7 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
     username = models.CharField(max_length=255,unique=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    other_name = models.CharField(max_length=255,blank=True)
+    other_name = models.CharField(max_length=255,null=True,blank=True)
     ippis_number = models.BigIntegerField(default=0000000)
     dob = models.DateField(default="2000-01-02")
     dofa = models.DateField(default="2000-01-02")
