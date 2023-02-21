@@ -692,10 +692,10 @@ class CreateBulkSaving(generics.CreateAPIView):
                 
                 try:
                     
-                    profile = Profile.objects.get(ippis=master.ippis_number)
+                    user = User.objects.get(ippis_number=master.ippis_number)
                             
                     Saving.objects.create(  
-                        user=profile.user,
+                        user=user,
                         credit = master.amount,
                         narration = master.narration,
                         transaction_date = master.transaction_date,
@@ -705,7 +705,7 @@ class CreateBulkSaving(generics.CreateAPIView):
                     master.active = False
                     master.save()
     
-                except Profile.DoesNotExist:
+                except User.DoesNotExist:
                     continue
                 
             return Response(
@@ -720,6 +720,20 @@ class SavingsList(generics.ListAPIView):
     serializer_class = SavingSerializer
     queryset = Saving.objects.all()
     permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
+    
+# All deposit for a logged in user
+
+# saving list
+class myDepositList(generics.ListAPIView):
+    serializer_class = SavingSerializer
+    queryset = Saving.objects.filter()
+    permission_classes =[IsAuthenticated]
+    
+    def get_queryset(self):
+        user = self.request.user
+        
+        return Saving.objects.filter(user=user)
+
 
 class SavingDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = SavingSerializer
