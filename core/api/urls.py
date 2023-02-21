@@ -73,6 +73,8 @@ urlpatterns =[
     # list saving given userid
     path('<int:pk>/user-saving/',ListUserSavings.as_view(),name="user-saving"),
     
+    path('user-deposit/',myDepositList.as_view(),name="user-deposit"),
+    
     # statement of saving
     path('<int:pk>/<str:startdate>/<str:enddate>/mystatement/',StatementofSavings.as_view(),name="saving-statement"),
     
