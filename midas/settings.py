@@ -125,6 +125,17 @@ WSGI_APPLICATION = 'midas.wsgi.application'
 #     }
 # }
 
+# production
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME':'railway',
+        'USER': 'postgres',
+        'PASSWORD':'IATtrypy9yzd2ITLRCQ5',
+        'HOST':'containers-us-west-18.railway.app',
+        'PORT':'5435',
+    }
+}
 
 # DATABASES={
 #     'default': dj_database_url.parse(env('DATABASE_URL'))
