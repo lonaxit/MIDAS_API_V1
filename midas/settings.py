@@ -1,23 +1,28 @@
 
 
 from pathlib import Path
+# configure environment for deployment
+import dj_database_url
+import environ
+import os
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# configure environment for deployment
-import dj_database_url
-import environ
 
 env = environ.Env()
-environ.Env.read_env()
+# environ.Env.read_env()
+
+# Take environment variables from .env file
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING:
-SECRET_KEY = 'django-insecure-p=tt6(je38hm4$2k5wt1xecbzvuzqfmqyv%4o8486t9^90k26n'
+SECRET_KEY = env('SECRET_KEY')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -27,7 +32,7 @@ SECRET_KEY = 'django-insecure-p=tt6(je38hm4$2k5wt1xecbzvuzqfmqyv%4o8486t9^90k26n
 # for production
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['midasapiv1-production.up.railway.app']
 
 
 # Application definition
