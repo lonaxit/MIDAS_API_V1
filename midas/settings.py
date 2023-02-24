@@ -16,8 +16,9 @@ environ.Env.read_env()
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-p=tt6(je38hm4$2k5wt1xecbzvuzqfmqyv%4o8486t9^90k26n'
+# SECURITY WARNING: original key
+# SECRET_KEY = 'django-insecure-p=tt6(je38hm4$2k5wt1xecbzvuzqfmqyv%4o8486t9^90k26n'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # dev
@@ -110,24 +111,24 @@ WSGI_APPLICATION = 'midas.wsgi.application'
 
 
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         # 'NAME':'midas_api',
-#         # 'USER': 'postgres',
-#         # 'PASSWORD':'2021_lonax',
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        # 'NAME':'midas_api',
+        # 'USER': 'postgres',
+        # 'PASSWORD':'2021_lonax',
         
-#         'NAME':'midas_production_db',
-#         'USER': 'postgres',
-#         'PASSWORD':'2021_lonax',
-#         'HOST':'localhost',
-#     }
-# }
-
-
-DATABASES={
-    'default': dj_database_url.parse(env('DATABASE_URL'))
+        'NAME':'midas_production_db',
+        'USER': 'postgres',
+        'PASSWORD':'2021_lonax',
+        'HOST':'localhost',
+    }
 }
+
+
+# DATABASES={
+#     'default': dj_database_url.parse(env('DATABASE_URL'))
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
