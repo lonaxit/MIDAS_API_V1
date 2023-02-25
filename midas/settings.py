@@ -71,11 +71,11 @@ INSTALLED_APPS = [
 CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ORIGIN_WHITELIST = (
-    'https://midastouchonline.co/',
-    'https://www.midastouchonline.co/',
-    'https://midas-frontend.onrender.com/',
-    'http://localhost:8080',
-    'http://localhost:8081',
+    'midastouchonline.co',
+    'www.midastouchonline.co',
+    'midas-frontend.onrender.com',
+    'localhost:8080',
+    'localhost:8081',
 )
 
 # config
