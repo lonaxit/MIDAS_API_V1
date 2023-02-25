@@ -4,7 +4,6 @@ from pathlib import Path
 # configure environment for deployment
 import dj_database_url
 import environ
-from decouple import config
 import os
 
 
@@ -14,24 +13,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env()
 
-# environ.Env.read_env()
+environ.Env.read_env()
 
 # Take environment variables from .env file
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+# environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING:
-SECRET_KEY = 'django-insecure-p=tt6(je38hm4$2k5wt1xecbzvuzqfmqyv%4o8486t9^90k26n'
+# SECRET_KEY = 'django-insecure-p=tt6(je38hm4$2k5wt1xecbzvuzqfmqyv%4o8486t9^90k26n'
 
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # dev
 # DEBUG = True
 
 # for production
-DEBUG = False
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = ['midasapiv1-production.up.railway.app']
 
@@ -132,14 +132,26 @@ WSGI_APPLICATION = 'midas.wsgi.application'
 # }
 
 # production
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME':'railway',
+#         'USER': 'postgres',
+#         'PASSWORD':'IATtrypy9yzd2ITLRCQ5',
+#         'HOST':'containers-us-west-18.railway.app',
+#         'PORT':'5435',
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME':'railway',
-        'USER': 'postgres',
-        'PASSWORD':'IATtrypy9yzd2ITLRCQ5',
-        'HOST':'containers-us-west-18.railway.app',
-        'PORT':'5435',
+        'NAME':env('NAME'),
+        'USER':env('USER'),
+        'PASSWORD':env('PASSWORD'),
+        'HOST': env('HOST'),
+        'PORT':env('PORT'),
     }
 }
 
