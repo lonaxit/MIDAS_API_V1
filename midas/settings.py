@@ -74,6 +74,7 @@ CORS_ORIGIN_WHITELIST = (
     'http://midastouchonline.co',
     'https://www.midastouchonline.co',
     'https://midas-frontend.onrender.com',
+    # 'https://midasapiv1-production.up.railway.app/'
     # 'localhost:8080',
     # 'localhost:8081',
 )
