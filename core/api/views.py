@@ -331,12 +331,13 @@ class MonthlyLoanDeductionUpload(generics.CreateAPIView):
 
 
                 # save in the monthly loan summary deduction table
-                MasterLoanDeductionSummary.objects.create(
-                                        transaction_code = random_number,
-                                        monthly_cumulative = float(total_cumulative),
-                                        transaction_date =transaction_date,
-                                        created_by=request.user,
-                                        )
+                # TODO REMOVE FOR NOW
+                # MasterLoanDeductionSummary.objects.create(
+                #                         transaction_code = random_number,
+                #                         monthly_cumulative = float(total_cumulative),
+                #                         transaction_date =transaction_date,
+                #                         created_by=request.user,
+                #                         )
             except Exception as e:
                 # raise ValidationError('A bad operation happened!')
                 return Response(
@@ -850,26 +851,405 @@ class allStatementByDate(generics.ListAPIView):
             raise ValidationError('User Does Not exist')
         
 
-
-
-          
-# import io, csv, pandas as pd
-# class UploadFileView(generics.CreateAPIView):
-#     serializer_class = FileUploadSerializer
+# data migration endpoints
+class MigrateUsers(generics.CreateAPIView):
+    serializer_class = UserSerializer
+    parser_classes = (MultiPartParser, FormParser,)
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
     
-#     def post(self, request, *args, **kwargs):
-#         serializer = self.get_serializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         file = serializer.validated_data['file']
-#         reader = pd.read_csv(file)
-#         for _, row in reader.iterrows():
-#             new_file = File(
-#                        id = row['id'],
-#                        staff_name= row["Staff Name"],
-#                        position= row['Designated Position'],
-#                        age= row["Age"],
-#                        year_joined= row["Year Joined"]
-#                        )
-#             new_file.save()
-#         return Response({"status": "success"},
-#                         status.HTTP_201_CREATED)
+    def get_queryset(self):
+        # just return the review object
+        return User.objects.all()
+    
+    def post(self, request, *args, **kwargs):
+        
+        data = request.FILES['file']
+        reader = pd.read_excel(data)
+        reader = reader.where(pd.notnull(reader), None)
+        dtframe = reader
+        
+        with transaction.atomic():
+              
+            try:
+                
+                for dtframe in dtframe.itertuples():
+                    
+                    
+                    userObj = User.objects.create(
+                        username = int(dtframe.id),
+                        first_name = dtframe.first_name,
+                        last_name =  dtframe.last_name,
+                        other_name =  dtframe.other_name,
+                        ippis_number = int(dtframe.payment_number),
+                        dob = dtframe.dob,
+                        dofa = dtframe.dofa,
+                        # password = set_password(dtframe.payment_number),
+                        # date_joined = dtframe.date_entry,
+                                    )
+                    userObj.set_password(str(dtframe.payment_number))
+                    userObj.date_joined = dtframe.date_entry
+                    userObj.save()
+            except Exception as e:
+                raise ValidationError(e)
+           
+        return Response(
+                {'msg':'User Migrated Successfuly'},
+                status = status.HTTP_201_CREATED
+                )
+
+         
+# migrate product categories 
+class MigrateProductCategory(generics.CreateAPIView):
+    serializer_class = ProductSchemeSerializer
+    parser_classes = (MultiPartParser, FormParser,)
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+    def get_queryset(self):
+        # just return the review object
+        return ProductScheme.objects.all()
+    
+    def post(self, request, *args, **kwargs):
+        
+        data = request.FILES['file']
+        reader = pd.read_excel(data)
+        reader = reader.where(pd.notnull(reader), None)
+        dtframe = reader
+        
+        with transaction.atomic():
+              
+            try:
+                
+                for dtframe in dtframe.itertuples():
+                    
+                    ProductScheme.objects.create(
+                        name = dtframe.name,
+                        description = dtframe.description,
+                    )
+                  
+            except Exception as e:
+                raise ValidationError(e)
+           
+        return Response(
+                {'msg':'Product Category Migrated Successfuly'},
+                status = status.HTTP_201_CREATED
+                )
+
+
+# migrate products
+class MigrateProducts(generics.CreateAPIView):
+    serializer_class = ProductSerializer
+    parser_classes = (MultiPartParser, FormParser,)
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+    def get_queryset(self):
+        # just return the review object
+        return Product.objects.all()
+    
+    def post(self, request, *args, **kwargs):
+        
+        data = request.FILES['file']
+        reader = pd.read_excel(data)
+        reader = reader.where(pd.notnull(reader), None)
+        dtframe = reader
+        
+        with transaction.atomic():
+              
+            try:
+                
+                for dtframe in dtframe.itertuples():
+                    
+                    Product.objects.create(
+                        name = dtframe.name,
+                        description = dtframe.description,
+                        product_scheme= dtframe.product_scheme
+                    )
+                  
+            except Exception as e:
+                raise ValidationError(e)
+           
+        return Response(
+                {'msg':'Products Migrated Successfuly'},
+                status = status.HTTP_201_CREATED
+                )
+
+# migrate loan subscriptions
+class MigrateLoanSub(generics.CreateAPIView):
+    serializer_class = LoanSerializer
+    parser_classes = (MultiPartParser, FormParser,)
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+    def get_queryset(self):
+        # just return the review object
+        return Loan.objects.all()
+    
+    def post(self, request, *args, **kwargs):
+        
+        data = request.FILES['file']
+        reader = pd.read_excel(data)
+        reader = reader.where(pd.notnull(reader), None)
+        dtframe = reader
+        
+        with transaction.atomic():
+              
+            try:
+                
+                for dtframe in dtframe.itertuples():
+                    
+                    Loan.objects.create(
+                        loan_date = dtframe.disbursement_date,
+                        start_date = dtframe.loan_start_date,
+                        end_date = dtframe.loan_end_date,
+                        active = dtframe.loan_status,
+                        transaction_code = int(2222),
+                        applied_amount= float(dtframe.amount_applied),
+                        approved_amount = float(dtframe.amount_approved),
+                        monthly_deduction = float(dtframe.monthly_deduction),
+                        net_pay= float(0.00),
+                        tenor = int(dtframe.custom_tenor),
+                        created_by = request.user,
+                        product= Product.objects.get(pk=int(dtframe.product_id)),
+                        owner = User.objects.get(pk = int(dtframe.user_id)),
+                        guarantor_one= User.objects.get(pk=int(dtframe.guarantor_id1)),
+                        guarantor_two =User.objects.get(pk=int(dtframe.guarantor_id2)),
+                      
+                      
+
+                    )
+                  
+            except Exception as e:
+                raise ValidationError(e)
+           
+        return Response(
+                {'msg':'Loans Migrated Successfuly'},
+                status = status.HTTP_201_CREATED
+                )
+
+# migrate loan subscriptions without guarantors
+class MigrateLoanSubNoGuarantors(generics.CreateAPIView):
+    serializer_class = LoanSerializer
+    parser_classes = (MultiPartParser, FormParser,)
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+    def get_queryset(self):
+        # just return the review object
+        return Loan.objects.all()
+    
+    def post(self, request, *args, **kwargs):
+        
+        data = request.FILES['file']
+        reader = pd.read_excel(data)
+        reader = reader.where(pd.notnull(reader), None)
+        dtframe = reader
+        
+        with transaction.atomic():
+              
+            try:
+                
+                for dtframe in dtframe.itertuples():
+                    
+                    Loan.objects.create(
+                        loan_date = dtframe.disbursement_date,
+                        start_date = dtframe.loan_start_date,
+                        end_date = dtframe.loan_end_date,
+                        active = dtframe.loan_status,
+                        transaction_code = int(2222),
+                        applied_amount= float(dtframe.amount_applied),
+                        approved_amount = float(dtframe.amount_approved),
+                        monthly_deduction = float(dtframe.monthly_deduction),
+                        net_pay= float(0.00),
+                        tenor = int(dtframe.custom_tenor),
+                        created_by = request.user,
+                        product= Product.objects.get(pk=int(dtframe.product_id)),
+                        owner = User.objects.get(pk = int(dtframe.user_id)),
+                        # guarantor_one= User.objects.get(pk=int(dtframe.guarantor_id1)),
+                        # guarantor_two =User.objects.get(pk=int(dtframe.guarantor_id2)),
+
+                    )
+                  
+            except Exception as e:
+                raise ValidationError(e)
+           
+        return Response(
+                {'msg':'Loans Migrated Successfuly'},
+                status = status.HTTP_201_CREATED
+                )     
+        
+        
+# migrate master savings
+class MigrateMasterSavings(generics.CreateAPIView):
+    serializer_class = SavingMasterSerializer
+    parser_classes = (MultiPartParser, FormParser,)
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+    def get_queryset(self):
+        # just return the review object
+        return SavingMaster.objects.all()
+    
+    def post(self, request, *args, **kwargs):
+        
+        data = request.FILES['file']
+        reader = pd.read_excel(data)
+        reader = reader.where(pd.notnull(reader), None)
+        dtframe = reader
+        
+        with transaction.atomic():
+              
+            try:
+                
+                for dtframe in dtframe.itertuples():
+                    
+                    SavingMaster.objects.create(
+                        name = dtframe.name,
+                        ippis_number = dtframe.ippis_no,
+                        narration = dtframe.notes,
+                        amount = float(dtframe.saving_cumulative),
+                        transaction_code = int(2222),
+                        active= float(dtframe.status),
+                        transaction_date = dtframe.entry_date,
+                        upload_by = request.user,
+                    )
+                  
+            except Exception as e:
+                raise ValidationError(e)
+           
+        return Response(
+                {'msg':'Master Savings Migrated Successfuly'},
+                status = status.HTTP_201_CREATED
+                )   
+        
+        
+
+# migrate user savings
+class MigrateSavings(generics.CreateAPIView):
+    serializer_class = SavingSerializer
+    parser_classes = (MultiPartParser, FormParser,)
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+    def get_queryset(self):
+        # just return the review object
+        return Saving.objects.all()
+    
+    def post(self, request, *args, **kwargs):
+        
+        data = request.FILES['file']
+        reader = pd.read_excel(data)
+        reader = reader.where(pd.notnull(reader), 0)
+        dtframe = reader
+        
+        with transaction.atomic():
+              
+            try:
+                
+                for dtframe in dtframe.itertuples():
+                    
+                    Saving.objects.create(
+               
+                        transaction_date = dtframe.entry_date,
+                        transaction_code = int(2222),
+                        credit= float(dtframe.amount_saved),
+                        debit = dtframe.amount_withdrawn,
+                        narration = dtframe.notes,
+                        created_by = request.user,
+                        user = User.objects.get(pk = int(dtframe.user_id)),
+                    
+
+                    )
+                  
+            except Exception as e:
+                raise ValidationError(e)
+           
+        return Response(
+                {'msg':'Savings Migrated Successfuly'},
+                status = status.HTTP_201_CREATED
+                )    
+        
+        
+# Migrate MasterLoanDeduction
+class MigrateMasterLoanDeduction(generics.CreateAPIView):
+    serializer_class = MonthlyLoanDeductionSerializer
+    parser_classes = (MultiPartParser, FormParser,)
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+    def get_queryset(self):
+        # just return the review object
+        return MasterLoanDeduction.objects.all()
+    
+    def post(self, request, *args, **kwargs):
+        
+        data = request.FILES['file']
+        reader = pd.read_excel(data)
+        reader['master_reference'] = reader['master_reference'].str.replace(' ', '').str.replace('-', '')
+        reader = reader.where(pd.notnull(reader), None)
+        dtframe = reader
+        
+        with transaction.atomic():
+              
+            try:
+                
+                for dtframe in dtframe.itertuples():
+                    
+                    MasterLoanDeduction.objects.create(
+                        
+                        name = dtframe.name,
+                        ippis_number = dtframe.ippis_no,
+                        entry_date = dtframe.entry_date,
+                        active = dtframe.status,
+                        transaction_code = int(dtframe.master_reference),
+                        cumulative_amount= float(dtframe.cumulative_amount),
+                        narration = dtframe.description,
+                        created_by = request.user,
+                    )
+                  
+            except Exception as e:
+                raise ValidationError(e)
+           
+        return Response(
+                {'msg':'Master Loan Deduction Migrated Successfuly'},
+                status = status.HTTP_201_CREATED
+                ) 
+     
+
+# Migrate Loan deduction
+class MigrateLoanDeduction(generics.CreateAPIView):
+    serializer_class = DeductionSerializer
+    parser_classes = (MultiPartParser, FormParser,)
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+    def get_queryset(self):
+        # just return the review object
+        return Deduction.objects.all()
+    
+    def post(self, request, *args, **kwargs):
+        
+        data = request.FILES['file']
+        reader = pd.read_excel(data)
+        reader['deduct_reference'] = reader['deduct_reference'].str.replace(' ', '').str.replace('-', '')
+        reader = reader.where(pd.notnull(reader), None)
+        dtframe = reader
+        
+        with transaction.atomic():
+              
+            try:
+                
+                for dtframe in dtframe.itertuples():
+                    
+                    Deduction.objects.create(
+         
+                        loanee = User.objects.get(int(dtframe.user_id)),
+                        loan = Loan.objects.get(int(dtframe.lsubscription_id)),
+                        transaction_date = dtframe.entry_month,
+                        transaction_code = int(dtframe.deduct_reference),
+                        credit= float(dtframe.amount_deducted),
+                        debit= float(dtframe.amount_debited),
+                        narration = dtframe.notes,
+                        created_by = request.user,
+                    )
+                  
+            except Exception as e:
+                raise ValidationError(e)
+           
+        return Response(
+                {'msg':'Loan Deduction Migrated Successfuly'},
+                status = status.HTTP_201_CREATED
+                ) 
+          
