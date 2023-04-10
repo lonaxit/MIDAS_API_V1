@@ -84,5 +84,22 @@ urlpatterns =[
      # User Opening Balance 
     path('<int:pk>/<str:startdate>/deposit-opening/balance/',UserOpeningBalance.as_view(),name="deposit=opening-balance"),
     
+    
+    
+    # db migration
+    path('user-migration/', MigrateUsers.as_view(),name='migrate-users'),
+    
+    path('productschemes-migration/', MigrateProductCategory.as_view(),name='migrate-productschemes'),
+    
+     path('product-migration/', MigrateProducts.as_view(),name='migrate-products'),
+     
+     path('loans-migration/', MigrateLoanSub.as_view(),name='migrate-loans'),
+    
+    path('loans-without-guarantors/', MigrateLoanSubNoGuarantors.as_view(),name='migrate-loans'),
+    
+    path('migrate-mastersaving/', MigrateMasterSavings.as_view(),name='migrate-mastersaving'),
+    
+    path('migrate-savings/', MigrateSavings.as_view(),name='migrate-savings'),
+    path('migrate-MasterLoanDeduction/', MigrateMasterLoanDeduction.as_view())
 
 ]
