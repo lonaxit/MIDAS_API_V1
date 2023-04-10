@@ -48,12 +48,14 @@ class Product(models.Model):
 
 class Loan(models.Model):
     owner = models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name='loanowner')
+    guarantor_one = models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name='loanguarantorone',null=True, blank=True, default=None)
+    guarantor_two = models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name='loanguarantortwo', null=True, blank=True,default=None)
     product = models.ForeignKey(Product,on_delete=models.DO_NOTHING,related_name='loans')
     loan_date = models.DateField()
     start_date = models.DateField()
     end_date = models.DateField()
     active = models.BooleanField(default=True)
-    transaction_code = models.BigIntegerField()
+    transaction_code = models.BigIntegerField(null=True, blank=True)
     applied_amount = models.DecimalField(max_digits=20,decimal_places=2)
     approved_amount = models.DecimalField(max_digits=20,decimal_places=2)
     monthly_deduction = models.DecimalField(max_digits=20,decimal_places=2)
@@ -77,7 +79,7 @@ class MasterLoanDeduction(models.Model):
     active = models.BooleanField(default=True)
     transaction_code = models.BigIntegerField()
     cumulative_amount = models.DecimalField(max_digits=20,decimal_places=2)
-    balance = models.DecimalField(max_digits=20,decimal_places=2,null=True)
+    # balance = models.DecimalField(max_digits=20,decimal_places=2,null=True)
     
     created_by = models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name='masterloandeduction')
     created = models.DateTimeField(auto_now_add=True)
@@ -192,12 +194,3 @@ class MasterSavingSummary(models.Model):
 
     
     
-# 
-# class File(models.Model):
-#     id = models.CharField(primary_key=True, max_length=6)
-#     staff_name = models.CharField(max_length=100)
-#     position = models.CharField(max_length=200)
-#     age = models.IntegerField()
-#     year_joined = models.CharField(max_length=4)
-#     def __str__(self):
-#         return self.staff_name
