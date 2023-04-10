@@ -22,18 +22,20 @@ environ.Env.read_env()
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING:
-# SECRET_KEY = 'django-insecure-p=tt6(je38hm4$2k5wt1xecbzvuzqfmqyv%4o8486t9^90k26n'
+SECRET_KEY = 'django-insecure-p=tt6(je38hm4$2k5wt1xecbzvuzqfmqyv%4o8486t9^90k26n'
 
-SECRET_KEY = env('SECRET_KEY')
+# SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # dev
-# DEBUG = True
+DEBUG = True
 
 # for production
-DEBUG = env('DEBUG')
+# DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['midasapiv1-production.up.railway.app']
+# ALLOWED_HOSTS = ['midasapiv1-production.up.railway.app']
+
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -71,9 +73,11 @@ INSTALLED_APPS = [
 CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ORIGIN_WHITELIST = (
-    'https://midastouchonline.co',
-    'https://www.midastouchonline.co',
-    'https://midas-frontend.onrender.com',
+    # 'https://midastouchonline.co',
+    # 'https://www.midastouchonline.co',
+    # 'https://midas-frontend.onrender.com',
+      'http://localhost:8080',
+        'http://127.0.0.1:8080',
 )
 
 # config
@@ -117,19 +121,19 @@ WSGI_APPLICATION = 'midas.wsgi.application'
 
 
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         # 'NAME':'midas_api',
-#         # 'USER': 'postgres',
-#         # 'PASSWORD':'2021_lonax',
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        # 'NAME':'midas_api',
+        # 'USER': 'postgres',
+        # 'PASSWORD':'2021_lonax',
         
-#         'NAME':'midas_production_db',
-#         'USER': 'postgres',
-#         'PASSWORD':'2021_lonax',
-#         'HOST':'localhost',
-#     }
-# }
+        'NAME':'midas_production_db',
+        'USER': 'postgres',
+        'PASSWORD':'2021_lonax',
+        'HOST':'localhost',
+    }
+}
 
 # production
 
@@ -144,16 +148,17 @@ WSGI_APPLICATION = 'midas.wsgi.application'
 #     }
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME':env('NAME'),
-        'USER':env('USER'),
-        'PASSWORD':env('PASSWORD'),
-        'HOST': env('HOST'),
-        'PORT':env('PORT'),
-    }
-}
+# production settings uncomment when ready
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME':env('NAME'),
+#         'USER':env('USER'),
+#         'PASSWORD':env('PASSWORD'),
+#         'HOST': env('HOST'),
+#         'PORT':env('PORT'),
+#     }
+# }
 
 # DATABASES={
 #     'default': dj_database_url.parse(env('DATABASE_URL'))
