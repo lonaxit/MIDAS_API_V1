@@ -1,7 +1,7 @@
 
 import random
 import string
-
+import math
 import io, csv, pandas as pd
 from users.serializers import *
 from core.api.serializers import *
@@ -994,6 +994,13 @@ class MigrateLoanSub(generics.CreateAPIView):
             try:
                 
                 for dtframe in dtframe.itertuples():
+                    guarantor_id1 = 0
+                    guarantor_id2 = 0
+                    
+                    if not math.isnan(dtframe.guarantor_id1):
+                        guarantor_id1 = dtframe.guarantor_id1
+                    elif not math.isnan(dtframe.guarantor_id2):
+                        guarantor_id2 = dtframe.guarantor_id2
                     
                     Loan.objects.create(
                         loan_date = dtframe.disbursement_date,
@@ -1009,8 +1016,8 @@ class MigrateLoanSub(generics.CreateAPIView):
                         created_by = request.user,
                         product= Product.objects.get(pk=int(dtframe.product_id)),
                         owner = User.objects.get(pk = int(dtframe.user_id)),
-                        guarantor_one= dtframe.guarantor_id1,
-                        guarantor_two = dtframe.guarantor_id2,
+                        guarantor_one= guarantor_id1,
+                        guarantor_two = guarantor_id2,
                     )
                   
             except Exception as e:
