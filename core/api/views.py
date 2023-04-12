@@ -1009,8 +1009,8 @@ class MigrateLoanSub(generics.CreateAPIView):
                         created_by = request.user,
                         product= Product.objects.get(pk=int(dtframe.product_id)),
                         owner = User.objects.get(pk = int(dtframe.user_id)),
-                        guarantor_one= int(dtframe.guarantor_id1),
-                        guarantor_two = int(dtframe.guarantor_id2),
+                        guarantor_one= dtframe.guarantor_id1,
+                        guarantor_two = dtframe.guarantor_id2,
                     )
                   
             except Exception as e:
