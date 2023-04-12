@@ -994,7 +994,8 @@ class MigrateLoanSub(generics.CreateAPIView):
             try:
                 
                 for dtframe in dtframe.itertuples():
-                    
+                    userId1=''
+                    userId2=''
                     if dtframe.guarantor_id1:
                         userId1 = User.objects.get(pk=int(dtframe.guarantor_id1))
                     elif not dtframe.guarantor_id1:
