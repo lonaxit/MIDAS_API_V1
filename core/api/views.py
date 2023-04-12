@@ -961,7 +961,7 @@ class MigrateProducts(generics.CreateAPIView):
                     Product.objects.create(
                         name = dtframe.name,
                         description = dtframe.description,
-                        product_scheme= dtframe.product_scheme
+                        product_scheme= ProductScheme.objects.get(pk=int(dtframe.product_scheme))
                     )
                   
             except Exception as e:
