@@ -994,16 +994,6 @@ class MigrateLoanSub(generics.CreateAPIView):
             try:
                 
                 for dtframe in dtframe.itertuples():
-                    userId1=''
-                    userId2=''
-                    if dtframe.guarantor_id1:
-                        userId1 = User.objects.get(pk=int(dtframe.guarantor_id1))
-                    elif not dtframe.guarantor_id1:
-                        userId1=''
-                    elif dtframe.guarantor_id2:
-                        userId2 = User.objects.get(pk =int(dtframe.guarantor_id2))
-                    elif not dtframe.guarantor_id2:
-                        userId2=''
                     
                     Loan.objects.create(
                         loan_date = dtframe.disbursement_date,
@@ -1019,8 +1009,8 @@ class MigrateLoanSub(generics.CreateAPIView):
                         created_by = request.user,
                         product= Product.objects.get(pk=int(dtframe.product_id)),
                         owner = User.objects.get(pk = int(dtframe.user_id)),
-                        guarantor_one= userId1,
-                        guarantor_two =userId2,
+                        guarantor_one= int(dtframe.guarantor_id1),
+                        guarantor_two = int(dtframe.guarantor_id2),
                     )
                   
             except Exception as e:
