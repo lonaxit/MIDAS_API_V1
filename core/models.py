@@ -24,8 +24,8 @@ class Profile(models.Model):
     nok_relationship = models.CharField(max_length=50, null=True,blank=True)
     bank = models.CharField(max_length=50, null=True,blank=True)
     bank_account= models.CharField(max_length=20, null=True,blank=True)
-    created = models.DateTimeField(auto_now_add=True,default=timezone.now)
-    updated = models.DateTimeField(auto_now=True,default=timezone.now)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
  
     
     
@@ -36,8 +36,8 @@ class Profile(models.Model):
 class ProductScheme(models.Model):
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=200, null=True,blank=True)
-    created = models.DateTimeField(auto_now_add=True,default=timezone.now)
-    updated = models.DateTimeField(auto_now=True,default=timezone.now)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return self.name
@@ -47,8 +47,8 @@ class Product(models.Model):
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=200,null=True,blank=True)
     product_scheme = models.ForeignKey(ProductScheme,on_delete=models.DO_NOTHING,related_name='products')
-    created = models.DateTimeField(auto_now_add=True,default=timezone.now)
-    updated = models.DateTimeField(auto_now=True,default=timezone.now)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return self.name
