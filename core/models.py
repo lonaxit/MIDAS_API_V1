@@ -55,8 +55,8 @@ class Product(models.Model):
 
 class Loan(models.Model):
     owner = models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name='loanowner')
-    guarantor_one = models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name='loanguarantorone',null=True, blank=True, default=None)
-    guarantor_two = models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name='loanguarantortwo', null=True, blank=True,default=None)
+    guarantor_one = models.IntegerField(null=True, blank=True)
+    guarantor_two = models.IntegerField(null=True, blank=True)
     product = models.ForeignKey(Product,on_delete=models.DO_NOTHING,related_name='loans')
     loan_date = models.DateField()
     start_date = models.DateField()
