@@ -95,7 +95,7 @@ urlpatterns =[
      
     path('loans-migration/', MigrateLoanSub.as_view(),name='migrate-loans'),
      
-    path('dummy-loans/', DummyLoanSub.as_view(),name='dummy-loans'),
+    # path('dummy-loans/', DummyLoanSub.as_view(),name='dummy-loans'),
     
     path('loans-without-guarantors/', MigrateLoanSubNoGuarantors.as_view(),name='migrate-loans'),
     
