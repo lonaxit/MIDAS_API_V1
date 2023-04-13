@@ -91,9 +91,11 @@ urlpatterns =[
     
     path('productschemes-migration/', MigrateProductCategory.as_view(),name='migrate-productschemes'),
     
-     path('product-migration/', MigrateProducts.as_view(),name='migrate-products'),
+    path('product-migration/', MigrateProducts.as_view(),name='migrate-products'),
      
-     path('loans-migration/', MigrateLoanSub.as_view(),name='migrate-loans'),
+    path('loans-migration/', MigrateLoanSub.as_view(),name='migrate-loans'),
+     
+    path('dummy-loans/', DummyLoanSub.as_view(),name='dummy-loans'),
     
     path('loans-without-guarantors/', MigrateLoanSubNoGuarantors.as_view(),name='migrate-loans'),
     
