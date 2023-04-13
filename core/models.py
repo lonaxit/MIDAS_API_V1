@@ -77,6 +77,30 @@ class Loan(models.Model):
         return self.product.name
     
     
+class DummyLoan(models.Model):
+    owner = models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name='loanowner')
+    guarantor_one = models.IntegerField(null=True, blank=True)
+    guarantor_two = models.IntegerField(null=True, blank=True)
+    product = models.ForeignKey(Product,on_delete=models.DO_NOTHING,related_name='loans')
+    loan_date = models.DateField()
+    start_date = models.DateField()
+    end_date = models.DateField()
+    active = models.BooleanField(default=True)
+    transaction_code = models.BigIntegerField(null=True, blank=True)
+    applied_amount = models.DecimalField(max_digits=20,decimal_places=2)
+    approved_amount = models.DecimalField(max_digits=20,decimal_places=2)
+    monthly_deduction = models.DecimalField(max_digits=20,decimal_places=2)
+    net_pay = models.DecimalField(max_digits=20,decimal_places=2,null=True,blank=True)
+    tenor = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(36)])
+    created_by = models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name='loancreator')
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        
+        return self.product.name
+    
+    
 class MasterLoanDeduction(models.Model):
     
     name= models.CharField(max_length=200)
