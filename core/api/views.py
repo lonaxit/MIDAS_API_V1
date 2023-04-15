@@ -1059,8 +1059,8 @@ class loanMigrationCelery(generics.CreateAPIView):
             
               
             # try:
-         
-            create_loan_subscription.delay(json_data)
+            print(json_data)
+            # create_loan_subscription.delay(json_data)
                   
             # except Exception as e:
             #     raise ValidationError(e)
