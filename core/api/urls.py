@@ -95,7 +95,7 @@ urlpatterns =[
      
     path('loans-migration/', MigrateLoanSub.as_view(),name='migrate-loans'),
      
-    path('migrate-loans-celery/', MigrateLoanSub.as_view(),name='migrate-loans-celery'),
+    path('migrate-loans-celery/', loanMigrationCelery.as_view(),name='migrate-loans-celery'),
     
     # path('loans-without-guarantors/', MigrateLoanSubNoGuarantors.as_view(),name='migrate-loans'),
     
