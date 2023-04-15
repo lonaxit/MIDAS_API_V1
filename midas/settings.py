@@ -57,7 +57,7 @@ INSTALLED_APPS = [
     'profiles',
     'cooperators',
     'drf_spectacular',
-    # for celery backend
+# for celery backend
     'django_celery_results'
  ]
 
