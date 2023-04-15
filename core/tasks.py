@@ -60,10 +60,10 @@ def mul(x, y):
     
 @shared_task
 def create_loan_subscription(data):
-    data = json.loads(data)
+    # data = json.loads(data)
 
     # convert the JSON data to a DataFrame
-    data_frame = pd.read_json(json.dumps(data))
+    data_frame = pd.read_json(data)
     try:
         for row in data_frame.itertuples():
             guarantor_id1 = None
