@@ -57,6 +57,9 @@ INSTALLED_APPS = [
     'profiles',
     'cooperators',
     'drf_spectacular',
+    
+    # for celery
+    'django_celery_results',
  ]
 
 # WORKED
@@ -220,9 +223,12 @@ SPECTACULAR_SETTINGS = {
 # custom user
 AUTH_USER_MODEL = 'users.CustomUser'
 
-# Celery Settings
-# CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
-# CELER_ACCEPT_CONTENT= ['application/json']
-# CELERY_RESULT_SERIALIZER='json'
-# CELERY_TASK_SERIALIZER ='json'
-# CELERY_TIMEZONE='UTC'
+# railway
+CELERY_BROKER_URL='redis://default:BTKBUIj4ZRHdEDrOZGD3@containers-us-west-181.railway.app:5990'
+# Set up on render
+# CELERY_BROKER_URL = 'rediss://red-cgspo09jvhtrd2744bcg:FxktDLe9tDuiLaIpaasTVzXCQI8SrWN8@oregon-redis.render.com:6379'
+CELER_ACCEPT_CONTENT= ['application/json']
+CELERY_RESULT_SERIALIZER='json'
+CELERY_TASK_SERIALIZER ='json'
+CELERY_TIMEZONE='UTC'
+CELERY_RESULT_BACKEND = 'django-db'
