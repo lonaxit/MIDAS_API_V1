@@ -5,6 +5,7 @@ User = get_user_model()
 from rest_framework.exceptions import ValidationError
 import math
 import io, csv, pandas as pd
+import json
 
 @shared_task(bind=True)
 def fun(self):
@@ -58,9 +59,11 @@ def mul(x, y):
     
     
 @shared_task
-def create_loan_subscription(excel_data):
-    reader = pd.read_excel(excel_data)
-    data_frame = reader
+def create_loan_subscription(data):
+    data = json.loads(data)
+
+    # convert the JSON data to a DataFrame
+    data_frame = pd.read_json(json.dumps(data))
     try:
         for row in data_frame.itertuples():
             guarantor_id1 = None
