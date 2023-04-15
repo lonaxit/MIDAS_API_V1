@@ -1055,6 +1055,10 @@ class loanMigrationCelery(generics.CreateAPIView):
         
         with transaction.atomic():
             
+            data_frame = pd.read_json(data)
+            
+            print(data_frame)
+            
             
             
               
