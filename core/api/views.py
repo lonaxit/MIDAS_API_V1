@@ -2,6 +2,7 @@
 import random
 import string
 import math
+import json
 import io, csv, pandas as pd
 from users.serializers import *
 from core.api.serializers import *
@@ -1047,11 +1048,15 @@ class loanMigrationCelery(generics.CreateAPIView):
         dtframe = reader
         
         json_data = dtframe.to_json()
+        data = json.loads(json_data)
+
+        # convert the JSON data to a DataFrame
+        df = pd.read_json(json.dumps(data))
         
         with transaction.atomic():
               
             try:
-                print(json_data)
+                print(df)
                 
                 # create_loan_subscription.delay(json_data)
                   
