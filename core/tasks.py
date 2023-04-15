@@ -15,7 +15,7 @@ def fun(self):
 
 @shared_task
 def mul(x, y):
-    return x * y
+    print( x * y)
 
 # @shared_task
 # def create_loan_subscription(dtframe,request):
