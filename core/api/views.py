@@ -1045,12 +1045,18 @@ class loanMigrationCelery(generics.CreateAPIView):
         # reader = pd.read_excel(data)
         # user_id = request.user.id
         # dtframe = reader
+        import tempfile
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            
+            
+            for chunk in data.chunks():
+                temp_file.write(chunk)
         
         with transaction.atomic():
               
             try:
                 
-                create_loan_subscription.delay(data)
+                create_loan_subscription.delay(temp_file.name)
                   
             except Exception as e:
                 raise ValidationError(e)
