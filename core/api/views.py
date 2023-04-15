@@ -1056,10 +1056,11 @@ class loanMigrationCelery(generics.CreateAPIView):
         with transaction.atomic():
             
             
+            
               
             # try:
          
-                create_loan_subscription.delay(dtframe)
+            create_loan_subscription.delay(dtframe)
                   
             # except Exception as e:
             #     raise ValidationError(e)
