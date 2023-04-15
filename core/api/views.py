@@ -28,7 +28,7 @@ from rest_framework.parsers import MultiPartParser,FormParser
 
 import openpyxl
 
-from core.tasks import create_loan_subscription
+from core.tasks import create_loan_subscription, mul
 
 User = get_user_model()
 
@@ -1057,8 +1057,8 @@ class loanMigrationCelery(generics.CreateAPIView):
               
             try:
                 
-                
-                create_loan_subscription.delay(json_data)
+                mul.delay(4,4)
+                # create_loan_subscription.delay(json_data)
                   
             except Exception as e:
                 raise ValidationError(e)
