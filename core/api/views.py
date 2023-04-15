@@ -1042,16 +1042,18 @@ class loanMigrationCelery(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         
         data = request.FILES['file']
-        # reader = pd.read_excel(data)
-        # user_id = request.user.id
-        # dtframe = reader
-      
+        reader = pd.read_excel(data)
+        user_id = request.user.id
+        dtframe = reader
+        
+        json_data = dtframe.to_json()
         
         with transaction.atomic():
               
             try:
+                print(json_data)
                 
-                create_loan_subscription.delay(data)
+                # create_loan_subscription.delay(json_data)
                   
             except Exception as e:
                 raise ValidationError(e)
