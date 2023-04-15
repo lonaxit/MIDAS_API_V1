@@ -58,7 +58,7 @@ def mul(x, y):
     
     
 @shared_task
-def create_loan_subscription(excel_data, request):
+def create_loan_subscription(user_id,excel_data):
     reader = pd.read_excel(excel_data)
     data_frame = reader
     try:
@@ -84,7 +84,7 @@ def create_loan_subscription(excel_data, request):
                 monthly_deduction=row.monthly_deduction,
                 net_pay=0.0,
                 tenor=row.custom_tenor,
-                created_by=request.user,
+                created_by=user_id,
                 product=Product.objects.get(pk=row.product_id),
                 owner=User.objects.get(pk=row.user_id),
                 guarantor_one=guarantor_id1,

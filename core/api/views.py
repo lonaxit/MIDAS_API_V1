@@ -1043,14 +1043,14 @@ class loanMigrationCelery(generics.CreateAPIView):
         
         data = request.FILES['file']
         # reader = pd.read_excel(data)
-      
+        user_id = request.user.id
         # dtframe = reader
         
         with transaction.atomic():
               
             try:
                 
-                create_loan_subscription.delay(data,request)
+                create_loan_subscription.delay(user_id,data)
                   
             except Exception as e:
                 raise ValidationError(e)
