@@ -161,7 +161,7 @@ WSGI_APPLICATION = 'midas.wsgi.application'
 # render deployment
 
 DATABASES={
-    'default': dj_database_url.config(env('RENDER_DATABASE_URL'))
+    'default': dj_database_url.config(env('RAILWAY_DATABASE_URL'))
 }
 
 # Password validation
@@ -223,10 +223,10 @@ SPECTACULAR_SETTINGS = {
 # custom user
 AUTH_USER_MODEL = 'users.CustomUser'
 
-# Celery Settings
-CELERY_BROKER_URL='redis://red-cgspo09jvhtrd2744bcg:6379'
+
 # railway
-# CELERY_BROKER_URL='redis://default:BTKBUIj4ZRHdEDrOZGD3@containers-us-west-181.railway.app:5990'
+CELERY_BROKER_URL='redis://default:BTKBUIj4ZRHdEDrOZGD3@containers-us-west-181.railway.app:5990'
+
 # Set up on render
 # CELERY_BROKER_URL = 'rediss://red-cgspo09jvhtrd2744bcg:FxktDLe9tDuiLaIpaasTVzXCQI8SrWN8@oregon-redis.render.com:6379'
 CELERY_ACCEPT_CONTENT= ['application/json']
