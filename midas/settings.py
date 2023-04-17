@@ -138,28 +138,17 @@ WSGI_APPLICATION = 'midas.wsgi.application'
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME':'railway',
-#         'USER': 'postgres',
-#         'PASSWORD':'IATtrypy9yzd2ITLRCQ5',
-#         'HOST':'containers-us-west-18.railway.app',
-#         'PORT':'5435',
+#         'NAME':env('NAME'),
+#         'USER':env('USER'),
+#         'PASSWORD':env('PASSWORD'),
+#         'HOST': env('HOST'),
+#         'PORT':env('PORT'),
 #     }
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME':env('NAME'),
-        'USER':env('USER'),
-        'PASSWORD':env('PASSWORD'),
-        'HOST': env('HOST'),
-        'PORT':env('PORT'),
-    }
+DATABASES={
+    'default': dj_database_url.config(env('DATABASE_URL'))
 }
-
-# DATABASES={
-#     'default': dj_database_url.parse(env('DATABASE_URL'))
-# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
