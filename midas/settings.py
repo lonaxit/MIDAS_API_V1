@@ -135,20 +135,20 @@ WSGI_APPLICATION = 'midas.wsgi.application'
 
 # production
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME':env('NAME'),
-#         'USER':env('USER'),
-#         'PASSWORD':env('PASSWORD'),
-#         'HOST': env('HOST'),
-#         'PORT':env('PORT'),
-#     }
-# }
-
-DATABASES={
-    'default': dj_database_url.config(env('DATABASE_URL'))
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME':env('NAME'),
+        'USER':env('USER'),
+        'PASSWORD':env('PASSWORD'),
+        'HOST': env('HOST'),
+        'PORT':env('PORT'),
+    }
 }
+
+# DATABASES={
+#     'default': dj_database_url.config(env('DB_URL'))
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
