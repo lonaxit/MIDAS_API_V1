@@ -33,7 +33,7 @@ SECRET_KEY = env('SECRET_KEY')
 # for production
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['midasapiv1-production.up.railway.app']
+# ALLOWED_HOSTS = ['midasapiv1-production.up.railway.app']
 
 
 # Application definition
@@ -62,7 +62,7 @@ INSTALLED_APPS = [
  ]
 
 # WORKED
-# ALLOWED_HOSTS=['*']
+ALLOWED_HOSTS=['*']
 
 # CORS_ORIGIN_ALLOW_ALL = True
 
@@ -146,20 +146,23 @@ WSGI_APPLICATION = 'midas.wsgi.application'
 #     }
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME':env('NAME'),
-        'USER':env('USER'),
-        'PASSWORD':env('PASSWORD'),
-        'HOST': env('HOST'),
-        'PORT':env('PORT'),
-    }
-}
-
-# DATABASES={
-#     'default': dj_database_url.parse(env('DATABASE_URL'))
+# railway deployment
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME':env('NAME'),
+#         'USER':env('USER'),
+#         'PASSWORD':env('PASSWORD'),
+#         'HOST': env('HOST'),
+#         'PORT':env('PORT'),
+#     }
 # }
+
+# render deployment
+
+DATABASES={
+    'default': dj_database_url.config(env('RENDER_DATABASE_URL'))
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
