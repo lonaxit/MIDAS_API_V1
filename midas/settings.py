@@ -224,8 +224,9 @@ SPECTACULAR_SETTINGS = {
 AUTH_USER_MODEL = 'users.CustomUser'
 
 # Celery Settings
+CELERY_BROKER_URL=env('CELERY_BROKER_URL')
 # railway
-CELERY_BROKER_URL='redis://default:BTKBUIj4ZRHdEDrOZGD3@containers-us-west-181.railway.app:5990'
+# CELERY_BROKER_URL='redis://default:BTKBUIj4ZRHdEDrOZGD3@containers-us-west-181.railway.app:5990'
 # Set up on render
 # CELERY_BROKER_URL = 'rediss://red-cgspo09jvhtrd2744bcg:FxktDLe9tDuiLaIpaasTVzXCQI8SrWN8@oregon-redis.render.com:6379'
 CELERY_ACCEPT_CONTENT= ['application/json']
