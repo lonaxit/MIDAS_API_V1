@@ -1057,14 +1057,15 @@ class loanMigrationCelery(generics.CreateAPIView):
             
             data_frame = pd.read_json(json_data)
             
-            print(data_frame)
+            # print(data_frame)
             
             
             
               
             # try:
-            print(json_data)
+            # print(json_data)
             # create_loan_subscription.delay(json_data)
+            mul.delay(7,8)
                   
             # except Exception as e:
             #     raise ValidationError(e)
