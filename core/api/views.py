@@ -1055,17 +1055,11 @@ class loanMigrationCelery(generics.CreateAPIView):
         
         with transaction.atomic():
             
-            data_frame = pd.read_json(json_data)
-            
-            # print(data_frame)
-            
-            
-            
-              
+            # data_frame = pd.read_json(json_data)
             # try:
             # print(json_data)
-            # create_loan_subscription.delay(json_data)
-            mul.delay(7,8)
+            create_loan_subscription.delay(json_data)
+          
                   
             # except Exception as e:
             #     raise ValidationError(e)
