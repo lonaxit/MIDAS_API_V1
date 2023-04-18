@@ -14,9 +14,9 @@ import datetime
 #     print("You are in Fun function")
 #     return "done"
 
-# @shared_task
-# def mul(x, y):
-#     print( x * y)
+@shared_task
+def mul(x, y):
+    print( x * y)
     
 # @shared_task
 # def create_loan_subscription(data):
