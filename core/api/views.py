@@ -1071,58 +1071,7 @@ class loanMigrationCelery(generics.CreateAPIView):
                 status = status.HTTP_201_CREATED
                 )
 
-
-# migrate loan subscriptions without guarantors
-# class MigrateLoanSubNoGuarantors(generics.CreateAPIView):
-#     serializer_class = LoanSerializer
-#     parser_classes = (MultiPartParser, FormParser,)
-#     permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
-    
-#     def get_queryset(self):
-#         # just return the review object
-#         return Loan.objects.all()
-    
-#     def post(self, request, *args, **kwargs):
-        
-#         data = request.FILES['file']
-#         reader = pd.read_excel(data)
-#         reader = reader.where(pd.notnull(reader), None)
-#         dtframe = reader
-        
-#         with transaction.atomic():
-              
-#             try:
-                
-#                 for dtframe in dtframe.itertuples():
-                    
-#                     Loan.objects.create(
-#                         loan_date = dtframe.disbursement_date,
-#                         start_date = dtframe.loan_start_date,
-#                         end_date = dtframe.loan_end_date,
-#                         active = dtframe.loan_status,
-#                         transaction_code = int(2222),
-#                         applied_amount= float(dtframe.amount_applied),
-#                         approved_amount = float(dtframe.amount_approved),
-#                         monthly_deduction = float(dtframe.monthly_deduction),
-#                         net_pay= float(0.00),
-#                         tenor = int(dtframe.custom_tenor),
-#                         created_by = request.user,
-#                         product= Product.objects.get(pk=int(dtframe.product_id)),
-#                         owner = User.objects.get(pk = int(dtframe.user_id)),
-#                         # guarantor_one= User.objects.get(pk=int(dtframe.guarantor_id1)),
-#                         # guarantor_two =User.objects.get(pk=int(dtframe.guarantor_id2)),
-
-#                     )
-                  
-#             except Exception as e:
-#                 raise ValidationError(e)
-           
-#         return Response(
-#                 {'msg':'Loans Migrated Successfuly'},
-#                 status = status.HTTP_201_CREATED
-#                 )     
-        
-        
+      
 # migrate master savings
 class MigrateMasterSavings(generics.CreateAPIView):
     serializer_class = SavingMasterSerializer
