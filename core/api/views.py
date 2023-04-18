@@ -28,7 +28,7 @@ from rest_framework.parsers import MultiPartParser,FormParser
 
 import openpyxl
 
-from core.tasks import create_loan_subscription, mul
+# from core.tasks import create_loan_subscription, mul
 
 User = get_user_model()
 
@@ -1060,8 +1060,6 @@ class loanMigrationCelery(generics.CreateAPIView):
             print(data_frame)
             
             
-            
-              
             # try:
             print(json_data)
             # create_loan_subscription.delay(json_data)
