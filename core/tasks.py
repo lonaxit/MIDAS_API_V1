@@ -39,13 +39,13 @@ def create_loan_subscription(data):
                 guarantor_id2 = row.guarantor_id2
             import datetime 
             Loan.objects.create(
-                # loan_date=datetime.datetime.fromisoformat(str(row.disbursement_date)),
-                # start_date=datetime.datetime.fromisoformat(str(row.loan_start_date)),
-                # end_date=datetime.datetime.fromisoformat(str(row.loan_end_date)),
+                loan_date=datetime.datetime.fromisoformat(str(row.disbursement_date)),
+                start_date=datetime.datetime.fromisoformat(str(row.loan_start_date)),
+                end_date=datetime.datetime.fromisoformat(str(row.loan_end_date)),
                 
-                loan_date=row.disbursement_date,
-                start_date=row.loan_start_date,
-                end_date=row.loan_end_date,
+                # loan_date=row.disbursement_date,
+                # start_date=row.loan_start_date,
+                # end_date=row.loan_end_date,
                 active=row.loan_status,
                 transaction_code=row.ref.replace('-', ''), 
                 sub_id=row.id,
