@@ -29,14 +29,27 @@ def create_loan_subscription(data):
     
     try:
         for row in data_frame.itertuples():
-            guarantor_id1 = None
-            guarantor_id2 = None
+            guarantor_id1 = 0
+            guarantor_id2 = 0
             
-            if row.guarantor_id1 is not None:
+            if pd.isnull(row.guarantor_id1):
+                # Do something if the cell is empty
+                pass
+            else:
                 guarantor_id1 = row.guarantor_id1
                 
-            elif row.guarantor_id2 is not None:
+            if pd.isnull(row.guarantor_id2):
+                # Do something if the cell is empty
+                pass
+            else:
                 guarantor_id2 = row.guarantor_id2
+                
+            
+            # if row.guarantor_id1 is not None:
+            #     guarantor_id1 = row.guarantor_id1
+                
+            # elif row.guarantor_id2 is not None:
+            #     guarantor_id2 = row.guarantor_id2
             
             # timestamp_str = '1479340800000'
             loan_date_stamp=row.disbursement_date
