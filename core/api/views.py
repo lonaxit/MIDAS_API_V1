@@ -28,7 +28,7 @@ from rest_framework.parsers import MultiPartParser,FormParser
 
 import openpyxl
 
-# from core.tasks import create_loan_subscription, mul
+from core.tasks import create_loan_subscription, mul
 
 User = get_user_model()
 
