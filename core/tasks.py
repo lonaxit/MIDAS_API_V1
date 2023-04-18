@@ -15,8 +15,8 @@ import datetime
 #     return "done"
 
 @shared_task
-def mul(x, y):
-    print( x * y)
+def mul(x, y,z):
+    print( x * y * z)
     
 # @shared_task
 # def create_loan_subscription(data):
