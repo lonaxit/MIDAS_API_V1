@@ -2,6 +2,8 @@ from __future__ import absolute_import,unicode_literals
 import os
 
 from celery import Celery
+# from core.tasks import create_loan_subscription
+
 
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'midas.settings')
