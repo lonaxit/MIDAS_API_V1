@@ -125,6 +125,7 @@ class Deduction(models.Model):
     narration = models.CharField(max_length=250)
     transaction_code = models.BigIntegerField()
     transaction_date = models.DateField()
+    deduction_sub_id = models.IntegerField(null=True, blank=True)
     created_by = models.ForeignKey(User,on_delete=models.DO_NOTHING)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
