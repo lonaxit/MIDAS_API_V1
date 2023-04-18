@@ -16,6 +16,10 @@ app = Celery('midas')
 #   should have a `CELERY_` prefix.
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
+#we are using asia/kolkata time so we are making it False
+app.conf.timezone = 'Africa/Lagos'  # Set the Celery timezone to Lagos, Nigeria timezone
+app.conf.enable_utc = False  # Disable UTC timezone conversion
+
 # Load task modules from all registered Django apps.
 app.autodiscover_tasks()
 
