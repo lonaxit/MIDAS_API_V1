@@ -220,6 +220,6 @@ CELERY_TASK_SERIALIZER ='json'
 CELERY_TIMEZONE='UTC'
 CELERY_RESULT_BACKEND = 'django-db'
 
-CELERY_IMPORTS = (
-    'core.tasks',
-)
+# CELERY_IMPORTS = (
+#     'core.tasks',
+# )
