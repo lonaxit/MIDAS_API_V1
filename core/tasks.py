@@ -1,7 +1,7 @@
 from celery import shared_task
 
 from django.contrib.auth import get_user_model
-from core.models import Loan,Product
+from core.models import Loan,Product,Deduction
 from django.db import transaction
 from rest_framework.exceptions import ValidationError
 import math
@@ -74,6 +74,51 @@ def create_loan_subscription(data):
                 owner=User.objects.get(pk=row.user_id),
                 guarantor_one=guarantor_id1,
                 guarantor_two=guarantor_id2,
+            )
+                  
+    except ValueError as e:
+        raise ValueError(f"Invalid value: {e}")
+    except TypeError as e:
+        raise TypeError(f"Type error: {e}")
+    
+    
+@shared_task
+def upload_loan_deduction(data):
+
+    # convert the JSON data to a DataFrame
+    data_frame = pd.read_json(data)
+    
+    try:
+        for row in data_frame.itertuples():
+            amount_deducted = None
+            amount_debited = None
+            
+            if pd.isnull(row.amount_deducted):
+                # Do something if the cell is empty
+                pass
+            else:
+                amount_deducted = row.amount_deducted
+                
+            if pd.isnull(row.amount_debited):
+                # Do something if the cell is empty
+                pass
+            else:
+                amount_debited = row.amount_debited
+                
+            _date_stamp=row.entry_month
+            _date_timestamp_ms = int(_date_stamp) / 1000
+            _date = datetime.datetime.utcfromtimestamp(_date_timestamp_ms)
+            
+            Deduction.objects.create(
+                loanee=User.objects.get(pk=row.user_id),
+                loan=Loan.objects.get(pk=1),
+                credit = amount_deducted,
+                debit = amount_debited,
+                narration = row.notes,
+                transaction_code=row.deduction_reference.replace('-', ''), 
+                transaction_date=_date,
+                deduction_sub_id=row.lsubscription_id,
+                created_by=User.objects.get(pk=1),
             )
                   
     except ValueError as e:
