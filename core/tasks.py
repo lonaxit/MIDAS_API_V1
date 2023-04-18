@@ -37,11 +37,28 @@ def create_loan_subscription(data):
                 
             elif row.guarantor_id2 is not None:
                 guarantor_id2 = row.guarantor_id2
-            import datetime 
+            
+            # timestamp_str = '1479340800000'
+            loan_date_stamp=datetime.datetime.fromisoformat(str(row.disbursement_date))
+            loan_date_timestamp_ms = int(loan_date_stamp) / 1000
+            loan_date = datetime.datetime.utcfromtimestamp(loan_date_timestamp_ms)
+            
+            start_date_stamp=datetime.datetime.fromisoformat(str(row.loan_start_date))
+            start_date_timestamp_ms = int(start_date_stamp) / 1000
+            start_date = datetime.datetime.utcfromtimestamp(start_date_timestamp_ms)
+            
+            end_date_stamp=datetime.datetime.fromisoformat(str(row.loan_end_date))
+            end_date_timestamp_ms = int(end_date_stamp) / 1000
+            end_date = datetime.datetime.utcfromtimestamp(end_date_timestamp_ms)
+           
             Loan.objects.create(
-                loan_date=datetime.datetime.fromisoformat(str(row.disbursement_date)),
-                start_date=datetime.datetime.fromisoformat(str(row.loan_start_date)),
-                end_date=datetime.datetime.fromisoformat(str(row.loan_end_date)),
+                # loan_date=datetime.datetime.fromisoformat(str(row.disbursement_date)),
+                # start_date=datetime.datetime.fromisoformat(str(row.loan_start_date)),
+                # end_date=datetime.datetime.fromisoformat(str(row.loan_end_date)),
+                
+                loan_date=loan_date,
+                start_date=start_date,
+                end_date=end_date,
                
                 active=row.loan_status,
                 transaction_code=row.ref.replace('-', ''), 
