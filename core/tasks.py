@@ -115,7 +115,7 @@ def upload_loan_deduction(data):
                 credit = amount_deducted,
                 debit = amount_debited,
                 narration = row.notes,
-                transaction_code=row.deduction_reference.replace('-', ''), 
+                transaction_code=row.deduct_reference.replace('-', ''), 
                 transaction_date=_date,
                 deduction_sub_id=row.lsubscription_id,
                 created_by=User.objects.get(pk=1),
