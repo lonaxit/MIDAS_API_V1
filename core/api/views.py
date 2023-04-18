@@ -27,8 +27,7 @@ from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser,FormParser
 
 import openpyxl
-
-from core.tasks import create_loan_subscription, mul
+from core.tasks import create_loan_subscription, upload_loan_deduction
 
 User = get_user_model()
 
@@ -1090,29 +1089,8 @@ class MigrateLoanDeductionCelery(generics.CreateAPIView):
               
             try:
                 # call worker here
-                # upload_loan_deduction.delay(json_data)
+                upload_loan_deduction.delay(json_data)
                 
-                for dtframe in dtframe.itertuples():
-                    
-                    Loan.objects.create(
-                        loan_date = dtframe.disbursement_date,
-                        start_date = dtframe.loan_start_date,
-                        end_date = dtframe.loan_end_date,
-                        active = dtframe.loan_status,
-                        transaction_code = int(2222),
-                        applied_amount= float(dtframe.amount_applied),
-                        approved_amount = float(dtframe.amount_approved),
-                        monthly_deduction = float(dtframe.monthly_deduction),
-                        net_pay= float(0.00),
-                        tenor = int(dtframe.custom_tenor),
-                        created_by = request.user,
-                        product= Product.objects.get(pk=int(dtframe.product_id)),
-                        owner = User.objects.get(pk = int(dtframe.user_id)),
-                        # guarantor_one= User.objects.get(pk=int(dtframe.guarantor_id1)),
-                        # guarantor_two =User.objects.get(pk=int(dtframe.guarantor_id2)),
-
-                    )
-                  
             except Exception as e:
                 raise ValidationError(e)
             except ValueError as e:
