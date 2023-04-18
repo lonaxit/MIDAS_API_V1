@@ -44,14 +44,6 @@ def create_loan_subscription(data):
             else:
                 guarantor_id2 = row.guarantor_id2
                 
-            
-            # if row.guarantor_id1 is not None:
-            #     guarantor_id1 = row.guarantor_id1
-                
-            # elif row.guarantor_id2 is not None:
-            #     guarantor_id2 = row.guarantor_id2
-            
-            # timestamp_str = '1479340800000'
             loan_date_stamp=row.disbursement_date
             loan_date_timestamp_ms = int(loan_date_stamp) / 1000
             loan_date = datetime.datetime.utcfromtimestamp(loan_date_timestamp_ms)
@@ -65,10 +57,6 @@ def create_loan_subscription(data):
             end_date = datetime.datetime.utcfromtimestamp(end_date_timestamp_ms)
            
             Loan.objects.create(
-                # loan_date=datetime.datetime.fromisoformat(str(row.disbursement_date)),
-                # start_date=datetime.datetime.fromisoformat(str(row.loan_start_date)),
-                # end_date=datetime.datetime.fromisoformat(str(row.loan_end_date)),
-                
                 loan_date=loan_date,
                 start_date=start_date,
                 end_date=end_date,
