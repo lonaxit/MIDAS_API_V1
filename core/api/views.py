@@ -1058,7 +1058,8 @@ class loanMigrationCelery(generics.CreateAPIView):
             # data_frame = pd.read_json(json_data)
             # try:
             # print(json_data)
-            create_loan_subscription.delay(json_data)
+            mul(9,10)
+            # create_loan_subscription.delay(json_data)
           
                   
             # except Exception as e:
