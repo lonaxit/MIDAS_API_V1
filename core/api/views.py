@@ -28,7 +28,7 @@ from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser,FormParser
 
 import openpyxl
-from core.tasks import create_loan_subscription, upload_loan_deduction,update_loan_deduction_loanids,upload_user_savings,update_profile,update_nok,update_bank,upload_master_loan_deduction
+from core.tasks import create_loan_subscription, upload_loan_deduction,update_loan_deduction_loanids,upload_user_savings,update_profile,update_nok,update_bank,upload_master_loan_deduction,upload_master_saving
 
 User = get_user_model()
 
@@ -1267,104 +1267,14 @@ class MigrateMasterLoanDeductionCelery(generics.CreateAPIView):
             raise ValidationError(e)
                     
         return Response(
-                {'msg':'Master Deductions Migrated Successfuly'},
+                {'msg':'Master Loan Deductions Migrated Successfuly'},
                 status = status.HTTP_201_CREATED
                 ) 
-
-
-
-# migrate master savings
-class MigrateMasterSavings(generics.CreateAPIView):
+      
+        
+#  migrate master saving deductions
+class MigrateMasterSavingDeductionCelery(generics.CreateAPIView):
     serializer_class = SavingMasterSerializer
-    parser_classes = (MultiPartParser, FormParser,)
-    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
-    
-    def get_queryset(self):
-        # just return the review object
-        return SavingMaster.objects.all()
-    
-    def post(self, request, *args, **kwargs):
-        
-        data = request.FILES['file']
-        reader = pd.read_excel(data)
-        reader = reader.where(pd.notnull(reader), None)
-        dtframe = reader
-        
-        with transaction.atomic():
-              
-            try:
-                
-                for dtframe in dtframe.itertuples():
-                    
-                    SavingMaster.objects.create(
-                        name = dtframe.name,
-                        ippis_number = dtframe.ippis_no,
-                        narration = dtframe.notes,
-                        amount = float(dtframe.saving_cumulative),
-                        transaction_code = int(2222),
-                        active= float(dtframe.status),
-                        transaction_date = dtframe.entry_date,
-                        upload_by = request.user,
-                    )
-                  
-            except Exception as e:
-                raise ValidationError(e)
-           
-        return Response(
-                {'msg':'Master Savings Migrated Successfuly'},
-                status = status.HTTP_201_CREATED
-                )   
-        
-        
-
-# migrate user savings
-class MigrateSavings(generics.CreateAPIView):
-    serializer_class = SavingSerializer
-    parser_classes = (MultiPartParser, FormParser,)
-    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
-    
-    def get_queryset(self):
-        # just return the review object
-        return Saving.objects.all()
-    
-    def post(self, request, *args, **kwargs):
-        
-        data = request.FILES['file']
-        reader = pd.read_excel(data)
-        reader = reader.where(pd.notnull(reader), 0)
-        dtframe = reader
-        
-        with transaction.atomic():
-              
-            try:
-                
-                for dtframe in dtframe.itertuples():
-                    
-                    Saving.objects.create(
-               
-                        transaction_date = dtframe.entry_date,
-                        transaction_code = int(2222),
-                        credit= float(dtframe.amount_saved),
-                        debit = dtframe.amount_withdrawn,
-                        narration = dtframe.notes,
-                        created_by = request.user,
-                        user = User.objects.get(pk = int(dtframe.user_id)),
-                    
-
-                    )
-                  
-            except Exception as e:
-                raise ValidationError(e)
-           
-        return Response(
-                {'msg':'Savings Migrated Successfuly'},
-                status = status.HTTP_201_CREATED
-                )    
-        
-        
-# Migrate MasterLoanDeduction
-class MigrateMasterLoanDeduction(generics.CreateAPIView):
-    serializer_class = MonthlyLoanDeductionSerializer
     parser_classes = (MultiPartParser, FormParser,)
     permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
     
@@ -1376,78 +1286,23 @@ class MigrateMasterLoanDeduction(generics.CreateAPIView):
         
         data = request.FILES['file']
         reader = pd.read_excel(data)
-        reader['master_reference'] = reader['master_reference'].str.replace(' ', '').str.replace('-', '')
-        reader = reader.where(pd.notnull(reader), None)
         dtframe = reader
         
-        with transaction.atomic():
-              
-            try:
-                
-                for dtframe in dtframe.itertuples():
+        json_data = dtframe.to_json()
+        try:
+            userid = request.user.id
+            upload_master_saving.delay(userid,json_data)
+        except Exception as e:
+            raise ValidationError(e)
                     
-                    MasterLoanDeduction.objects.create(
-                        
-                        name = dtframe.name,
-                        ippis_number = dtframe.ippis_no,
-                        entry_date = dtframe.entry_date,
-                        active = dtframe.status,
-                        transaction_code = int(dtframe.master_reference),
-                        cumulative_amount= float(dtframe.cumulative_amount),
-                        narration = dtframe.description,
-                        created_by = request.user,
-                    )
-                  
-            except Exception as e:
-                raise ValidationError(e)
-           
         return Response(
-                {'msg':'Master Loan Deduction Migrated Successfuly'},
+                {'msg':'Master Deductions Migrated Successfuly'},
                 status = status.HTTP_201_CREATED
                 ) 
-     
 
-# Migrate Loan deduction
-class MigrateLoanDeduction(generics.CreateAPIView):
-    serializer_class = DeductionSerializer
-    parser_classes = (MultiPartParser, FormParser,)
-    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
-    
-    def get_queryset(self):
-        # just return the review object
-        return Deduction.objects.all()
-    
-    def post(self, request, *args, **kwargs):
+
+
+ 
         
-        data = request.FILES['file']
-        reader = pd.read_excel(data)
-        reader['deduct_reference'] = reader['deduct_reference'].str.replace(' ', '').str.replace('-', '')
-        reader = reader.where(pd.notnull(reader), None)
-        dtframe = reader
         
-        with transaction.atomic():
-              
-            try:
-                
-                for dtframe in dtframe.itertuples():
-                    
-                    Deduction.objects.create(
-         
-                        loanee = User.objects.get(int(dtframe.user_id)),
-                        loan = Loan.objects.get(int(dtframe.lsubscription_id)),
-                        transaction_date = dtframe.entry_month,
-                        transaction_code = int(dtframe.deduct_reference),
-                        credit= float(dtframe.amount_deducted),
-                        debit= float(dtframe.amount_debited),
-                        narration = dtframe.notes,
-                        created_by = request.user,
-                    )
-                  
-            except Exception as e:
-                raise ValidationError(e)
-           
-        return Response(
-                {'msg':'Loan Deduction Migrated Successfuly'},
-                status = status.HTTP_201_CREATED
-                ) 
-          
+
