@@ -27,7 +27,7 @@ from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser,FormParser
 
 import openpyxl
-from core.tasks import create_loan_subscription, upload_loan_deduction,update_loan_deduction_loanids
+from core.tasks import create_loan_subscription, upload_loan_deduction,update_loan_deduction_loanids,upload_user_savings
 
 User = get_user_model()
 
@@ -1122,7 +1122,42 @@ class MigrateUpdateDeductionIdsCelery(generics.GenericAPIView,):
             raise ValidationError(e)
 
         return Response({'msg': 'Updated Successfully'}, status=status.HTTP_201_CREATED)
+
+
+# celery upload user savings
+
+class MigrateUserSavingCelery(generics.CreateAPIView):
+    serializer_class = SavingSerializer
+    parser_classes = (MultiPartParser, FormParser,)
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
     
+    def get_queryset(self):
+        # just return the review object
+        return Saving.objects.all()
+    
+    def post(self, request, *args, **kwargs):
+        
+        data = request.FILES['file']
+        reader = pd.read_excel(data)
+        dtframe = reader
+        
+        json_data = dtframe.to_json()
+        
+        
+        with transaction.atomic():
+              
+            try:
+                # call worker here
+                upload_user_savings.delay(request,json_data)
+                
+            except Exception as e:
+                raise ValidationError(e)
+        
+           
+        return Response(
+                {'msg':'Loans Migrated Successfuly'},
+                status = status.HTTP_201_CREATED
+                ) 
     
         
 # migrate master savings
