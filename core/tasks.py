@@ -229,18 +229,18 @@ def update_profile(data):
                 # Attempt to get the order for the user
                 profile= Profile.objects.get(user_id=row.id)
                
-                # If the order exists, update it with the user's ID
+                #update profile
                 profile.staff_id = row.staff_no
                 profile.home_address = row.home_add
                 profile.email = row.email
-                profile.employment_type = row.employ_type
-                profile.gender = row.sex
+                profile.employment_type = row.employ_type.capitalize()
+                profile.gender = row.sex.capitalize()
                 profile.job_cadre = row.job_cadre
-                profile.marital_status = row.marital_status
+                profile.marital_status = row.marital_status.capitalize()
                 profile.phone = row.phone
                 profile.dept = row.dept
-                profile.title = row.title
-                profile.member_type = row.membership_type
+                profile.title = row.title.capitalize()
+                profile.member_type = row.membership_type.capitalize()
                 profile.save()
             except Profile.DoesNotExist:
                 pass
