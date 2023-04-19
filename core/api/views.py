@@ -1148,7 +1148,8 @@ class MigrateUserSavingCelery(generics.CreateAPIView):
               
             try:
                 # call worker here
-                upload_user_savings.delay(request,json_data)
+                userid = request.user.id
+                upload_user_savings.delay(userid,json_data)
                 
             except Exception as e:
                 raise ValidationError(e)
