@@ -14,6 +14,7 @@ class Profile(models.Model):
     home_address = models.CharField(max_length=500, null=True,blank=True)
     dept = models.CharField(max_length=500, null=True,blank=True)
     gender = models.CharField(max_length=10,null=True,blank=True)
+    title = models.CharField(max_length=10,null=True,blank=True)
     employment_type = models.CharField(max_length=100, null=True,blank=True)
     job_cadre = models.CharField(max_length=100,null=True,blank=True)
     phone = models.CharField(max_length=20,null=True,blank=True)
