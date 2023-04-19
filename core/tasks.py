@@ -1,7 +1,7 @@
 from __future__ import absolute_import,unicode_literals
 from celery import shared_task
 from django.contrib.auth import get_user_model
-from core.models import Loan,Deduction,Saving,Profile
+from core.models import Loan,Deduction,Saving,Profile,MasterLoanDeduction
 from django.db import transaction
 User = get_user_model()
 from rest_framework.exceptions import ValidationError
@@ -196,3 +196,33 @@ def update_bank(data):
                 profile.save()
             except Profile.DoesNotExist:
                 pass
+            
+@shared_task
+def upload_master_loan_deduction(userid,data):
+
+    # convert the JSON data to a DataFrame
+    data_frame = pd.read_json(data)
+    
+    with transaction.atomic():
+        try:
+            for row in data_frame.itertuples():
+            
+                _date_stamp=row.entry_date
+                _date_timestamp_ms = int(_date_stamp) / 1000
+                _date = datetime.datetime.utcfromtimestamp(_date_timestamp_ms)
+                
+                MasterLoanDeduction.objects.create(
+                    name=row.name,
+                    ippis_number=row.ippis_no,
+                    cumulative_amount = row.cumulative_amount,
+                    narration = row.description,
+                    transaction_code=row.master_reference.replace('-', ''),
+                    active = row.status, 
+                    entry_date=_date,
+                    created_by=User.objects.get(pk=userid),
+                )
+                    
+        except ValueError as e:
+            raise ValueError(f"Invalid value: {e}")
+        except TypeError as e:
+            raise TypeError(f"Type error: {e}")
