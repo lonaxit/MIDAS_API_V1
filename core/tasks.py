@@ -1,7 +1,7 @@
 from celery import shared_task
 
 from django.contrib.auth import get_user_model
-from core.models import Loan,Product,Deduction,Saving
+from core.models import Loan,Product,Deduction,Saving,Profile
 from django.db import transaction
 from rest_framework.exceptions import ValidationError
 import math
@@ -207,3 +207,42 @@ def upload_user_savings(userid,data):
             raise ValueError(f"Invalid value: {e}")
         except TypeError as e:
             raise TypeError(f"Type error: {e}")
+        
+
+# update profile 
+
+@shared_task
+def update_profile(data):
+    """
+    Update the 'profile' field of all users based on the related user ID.
+
+    This function loops through all profiles, filters prodile based on their
+    user ID, and updates relevant fields.
+    """
+    data_frame = pd.read_json(data)
+    
+    # profiles = Profile.objects.all()
+    with transaction.atomic():
+        for  row in data_frame.itertuples():
+            
+            try:
+                # Attempt to get the order for the user
+                profile= Profile.objects.get(pk=row.id)
+               
+                # If the order exists, update it with the user's ID
+                profile.staff_id = row.staff_no
+                profile.home_address = row.home_add
+                profile.email = row.email
+                profile.employment_type = row.employ_type
+                profile.gender = row.sex
+                profile.job_cadre = row.job_cadre
+                profile.marital_status = row.marital_status
+                profile.phone = row.phone
+                profile.dept = row.dept
+                profile.title = row.title
+                profile.member_type = row.membership_type
+                profile.save()
+            except Profile.DoesNotExist:
+                pass
+             
+    
