@@ -227,7 +227,7 @@ def update_profile(data):
             
             try:
                 # Attempt to get the order for the user
-                profile= Profile.objects.get(pk=row.id)
+                profile= Profile.objects.get(user_id=row.id)
                
                 # If the order exists, update it with the user's ID
                 profile.staff_id = row.staff_no
