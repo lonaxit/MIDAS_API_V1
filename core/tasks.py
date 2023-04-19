@@ -1,7 +1,7 @@
 from celery import shared_task
 
 from django.contrib.auth import get_user_model
-from core.models import Loan,Product,Deduction,Saving,Profile,MasterLoanDeduction
+from core.models import Loan,Product,Deduction,Saving,Profile,MasterLoanDeduction,SavingMaster
 from django.db import transaction
 from rest_framework.exceptions import ValidationError
 import math
@@ -326,6 +326,39 @@ def upload_master_loan_deduction(userid,data):
                     cumulative_amount = row.cumulative_amount,
                     narration = row.description,
                     transaction_code=row.master_reference.replace('-', ''),
+                    active = row.status, 
+                    entry_date=_date,
+                    created_by=User.objects.get(pk=userid),
+                )
+                    
+        except ValueError as e:
+            raise ValueError(f"Invalid value: {e}")
+        except TypeError as e:
+            raise TypeError(f"Type error: {e}")
+        
+
+# migrate master savings deductions
+
+@shared_task
+def upload_master_saving(userid,data):
+
+    # convert the JSON data to a DataFrame
+    data_frame = pd.read_json(data)
+    with transaction.atomic():
+        
+        try:
+            for row in data_frame.itertuples():
+            
+                _date_stamp=row.entry_date
+                _date_timestamp_ms = int(_date_stamp) / 1000
+                _date = datetime.datetime.utcfromtimestamp(_date_timestamp_ms)
+                
+                SavingMaster.objects.create(
+                    name=row.name,
+                    ippis_number=row.ippis_no,
+                    amount = row.saving_cumulative,
+                    narration = row.notes,
+                    transaction_code=row.ref_identification.replace('-', ''),
                     active = row.status, 
                     entry_date=_date,
                     created_by=User.objects.get(pk=userid),
