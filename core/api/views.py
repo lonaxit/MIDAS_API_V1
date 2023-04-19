@@ -1245,13 +1245,13 @@ class MigrateProfileBanksCelery(generics.CreateAPIView):
         
 #  migrate master loan deductions
 class MigrateMasterLoanDeductionCelery(generics.CreateAPIView):
-    serializer_class = ProfileSerializer
+    serializer_class = MonthlyLoanDeductionSerializer
     parser_classes = (MultiPartParser, FormParser,)
     permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
     
     def get_queryset(self):
         # just return the review object
-        return Profile.objects.all()
+        return MasterLoanDeduction.objects.all()
     
     def post(self, request, *args, **kwargs):
         
@@ -1267,9 +1267,11 @@ class MigrateMasterLoanDeductionCelery(generics.CreateAPIView):
             raise ValidationError(e)
                     
         return Response(
-                {'msg':'Profile Migrated Successfuly'},
+                {'msg':'Master Deductions Migrated Successfuly'},
                 status = status.HTTP_201_CREATED
                 ) 
+
+
 
 # migrate master savings
 class MigrateMasterSavings(generics.CreateAPIView):
