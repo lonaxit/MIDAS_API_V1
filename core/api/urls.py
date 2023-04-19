@@ -98,7 +98,8 @@ urlpatterns =[
     path('migrate-loans-celery/', loanMigrationCelery.as_view(),name='migrate-loans-celery'),
     path('loan_deduction-celery/', MigrateLoanDeductionCelery.as_view(),name='loan_deduction-celery'),
     path('update_deductionids/', MigrateUpdateDeductionIdsCelery.as_view(),name='update_deductionids'),
-     path('upload_usersavings/', MigrateUserSavingCelery.as_view(),name='upload_usersavings'),
+    path('upload_usersavings/', MigrateUserSavingCelery.as_view(),name='upload_usersavings'),
+    path('update_profile/', MigrateProfileUpdateCelery.as_view(),name='update_profile'),
     
     # path('loans-without-guarantors/', MigrateLoanSubNoGuarantors.as_view(),name='migrate-loans'),
     
