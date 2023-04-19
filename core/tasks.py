@@ -251,7 +251,7 @@ def upload_master_saving(userid,data):
                     transaction_code=row.ref_identification.replace('-', ''),
                     active = row.status, 
                     transaction_date=_date,
-                    created_by=User.objects.get(pk=userid),
+                    uploaded_by=User.objects.get(pk=userid),
                 )
                     
         except ValueError as e:
