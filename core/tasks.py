@@ -164,46 +164,46 @@ def update_loan_deduction_loanids():
     #             # If there are no deductions for this loan, do nothing
     #             pass
 
-# upload user savings   
+# upload user savings    
 @shared_task
 def upload_user_savings(request,data):
 
     # convert the JSON data to a DataFrame
     data_frame = pd.read_json(data)
     
-    try:
-        for row in data_frame.itertuples():
-            credit_amt = None
-            debit_amt = None
-            
-            if pd.isnull(row.amount_saved):
-                # Do something if the cell is empty
-                pass
-            else:
-                credit_amt = row.amount_saved
+    with transaction.atomic():
+        try:
+            for row in data_frame.itertuples():
+                credit_amt = None
+                debit_amt = None
                 
-            if pd.isnull(row.amount_withdrawn):
-                # Do something if the cell is empty
-                pass
-            else:
-                debit_amt = row.amount_withdrawn
+                if pd.isnull(row.amount_saved):
+                    # Do something if the cell is empty
+                    pass
+                else:
+                    credit_amt = row.amount_saved
+                    
+                if pd.isnull(row.amount_withdrawn):
+                    # Do something if the cell is empty
+                    pass
+                else:
+                    debit_amt = row.amount_withdrawn
 
+                _date_stamp=row.entry_date
+                _date_timestamp_ms = int(_date_stamp) / 1000
+                _date = datetime.datetime.utcfromtimestamp(_date_timestamp_ms)
                 
-            _date_stamp=row.entry_date
-            _date_timestamp_ms = int(_date_stamp) / 1000
-            _date = datetime.datetime.utcfromtimestamp(_date_timestamp_ms)
-            
-            Saving.objects.create(
-                user=User.objects.get(pk=row.user_id),
-                credit = credit_amt,
-                debit = debit_amt,
-                transaction_code=row.ref_string.replace('-', ''), 
-                transaction_date=_date,
-                narration = row.notes,
-                created_by=request.user,
-            )
-                  
-    except ValueError as e:
-        raise ValueError(f"Invalid value: {e}")
-    except TypeError as e:
-        raise TypeError(f"Type error: {e}")
+                Saving.objects.create(
+                    user=User.objects.get(pk=row.user_id),
+                    credit = credit_amt,
+                    debit = debit_amt,
+                    transaction_code=row.ref_string.replace('-', ''), 
+                    transaction_date=_date,
+                    narration = row.notes,
+                    created_by=request.user,
+                )
+                    
+        except ValueError as e:
+            raise ValueError(f"Invalid value: {e}")
+        except TypeError as e:
+            raise TypeError(f"Type error: {e}")
