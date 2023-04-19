@@ -10,7 +10,7 @@ from django.utils import timezone
 
 class Profile(models.Model):
     user= models.OneToOneField(User,on_delete=models.CASCADE)
-    staff_id = models.BigIntegerField(null=True, blank=True)
+    staff_id = models.CharField(max_length=20,null=True, blank=True)
     home_address = models.CharField(max_length=500, null=True,blank=True)
     dept = models.CharField(max_length=500, null=True,blank=True)
     gender = models.CharField(max_length=10,null=True,blank=True)
