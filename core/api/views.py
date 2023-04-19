@@ -27,7 +27,7 @@ from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser,FormParser
 
 import openpyxl
-from core.tasks import create_loan_subscription, upload_loan_deduction
+from core.tasks import create_loan_subscription, upload_loan_deduction,update_loan_deduction_loanids
 
 User = get_user_model()
 
@@ -1102,7 +1102,28 @@ class MigrateLoanDeductionCelery(generics.CreateAPIView):
                 {'msg':'Loans Migrated Successfuly'},
                 status = status.HTTP_201_CREATED
                 )     
-        
+
+
+# Migration: Update loan deduction ids
+
+class MigrateUpdateDeductionIdsCelery(generics.GenericAPIView,):
+    serializer_class = DeductionSerializer
+    parser_classes = (MultiPartParser, FormParser,)
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+    def get_queryset(self):
+        # just return the review object
+        return Deduction.objects.all()
+    
+    def post(self, request, *args, **kwargs):
+        try:
+            update_loan_deduction_loanids.delay()
+        except Exception as e:
+            raise ValidationError(e)
+
+        return Response({'msg': 'Updated Successfully'}, status=status.HTTP_201_CREATED)
+    
+    
         
 # migrate master savings
 class MigrateMasterSavings(generics.CreateAPIView):
