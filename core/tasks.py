@@ -138,19 +138,30 @@ def update_loan_deduction_loanids():
     loan's ID.
     """
     loans = Loan.objects.all()
-
     with transaction.atomic():
+        
         for loan in loans:
             deductions = Deduction.objects.filter(deduction_sub_id=loan.sub_id)
-
+            
             if deductions.exists():
-                deductions.update(loan=loan.id)
-            else:
-                # If there are no deductions for this loan, do nothing
-                pass
 
-    # Move the try-except block outside the with block
-    # try:
-    #     do_something()
-    # except Exception as e:
-    #     raise ValueError(f"Error: {e}")
+                # Use a for...else loop instead of if...else to make the code more concise
+                for deduction in deductions:
+                    deduction.loan = loan
+                    deduction.save()
+            else:
+                # The else block will execute only if the loop completes without a break
+                pass
+    # loans = Loan.objects.all()
+
+    # with transaction.atomic():
+    #     for item in loans:
+    #         deductions = Deduction.objects.filter(deduction_sub_id=item.sub_id)
+
+    #         if deductions.exists():
+    #             deductions.update(loan=item.id)
+    #         else:
+    #             # If there are no deductions for this loan, do nothing
+    #             pass
+
+   
