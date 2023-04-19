@@ -166,7 +166,7 @@ def update_loan_deduction_loanids():
 
 # upload user savings    
 @shared_task
-def upload_user_savings(request,data):
+def upload_user_savings(userid,data):
 
     # convert the JSON data to a DataFrame
     data_frame = pd.read_json(data)
@@ -200,7 +200,7 @@ def upload_user_savings(request,data):
                     transaction_code=row.ref_string.replace('-', ''), 
                     transaction_date=_date,
                     narration = row.notes,
-                    created_by=request.user,
+                    created_by=User.objects.get(pk=userid),
                 )
                     
         except ValueError as e:
