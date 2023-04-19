@@ -121,7 +121,6 @@ class Deduction(models.Model):
     loan = models.ForeignKey(Loan, on_delete=models.CASCADE,related_name='deductions')
     credit = models.DecimalField(max_digits=20,decimal_places=2,null=True,blank=True)
     debit = models.DecimalField(max_digits=20,decimal_places=2,null=True,blank=True)
-    # balance = models.DecimalField(max_digits=20,decimal_places=2)
     narration = models.CharField(max_length=250)
     transaction_code = models.BigIntegerField()
     deduction_sub_id = models.IntegerField(null=True, blank=True)
@@ -131,8 +130,6 @@ class Deduction(models.Model):
     updated = models.DateTimeField(auto_now=True)
     
     class Meta:
-        
-        
          ordering = ['-transaction_date']
         # get_latest_by = "transaction_date"
     
