@@ -233,14 +233,14 @@ def update_profile(data):
                 profile.staff_id = row.staff_no
                 profile.home_address = row.home_add
                 profile.email = row.email
-                profile.employment_type = row.employ_type.capitalize()
-                profile.gender = row.sex.capitalize()
+                profile.employment_type = row.employ_type
+                profile.gender = row.sex
                 profile.job_cadre = row.job_cadre
-                profile.marital_status = row.marital_status.capitalize()
+                profile.marital_status = row.marital_status
                 profile.phone = row.phone
                 profile.dept = row.dept
-                profile.title = row.title.capitalize()
-                profile.member_type = row.membership_type.capitalize()
+                profile.title = row.title
+                profile.member_type = row.membership_type
                 profile.save()
             except Profile.DoesNotExist:
                 pass
