@@ -261,7 +261,13 @@ def update_nok(data):
             firstname = row.last_name
             othername = row.other_name
             
-            full_name = surname + ' ' + firstname + ' ' + othername
+            full_name = surname + ' ' + firstname
+            
+            if pd.isnull(row.other_name):
+                    # Do something if the cell is empty
+                pass
+            else:
+                full_name = surname + ' ' + firstname + ' ' + othername
             
             try:
                 # Attempt to get the order for the user
