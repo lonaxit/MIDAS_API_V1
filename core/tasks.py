@@ -360,7 +360,7 @@ def upload_master_saving(userid,data):
                     narration = row.notes,
                     transaction_code=row.ref_identification.replace('-', ''),
                     active = row.status, 
-                    entry_date=_date,
+                    transaction_date=_date,
                     created_by=User.objects.get(pk=userid),
                 )
                     
