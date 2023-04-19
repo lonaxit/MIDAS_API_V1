@@ -6,6 +6,7 @@ import json
 import io, csv, pandas as pd
 from users.serializers import *
 from core.api.serializers import *
+from profiles.api.serializers import *
 from core.api.permissions import *
 from core.api.utilities import *
 # # import models
@@ -27,7 +28,7 @@ from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser,FormParser
 
 import openpyxl
-from core.tasks import create_loan_subscription, upload_loan_deduction,update_loan_deduction_loanids,upload_user_savings
+from core.tasks import create_loan_subscription, upload_loan_deduction,update_loan_deduction_loanids,upload_user_savings,update_profile
 
 User = get_user_model()
 
@@ -1160,7 +1161,33 @@ class MigrateUserSavingCelery(generics.CreateAPIView):
                 status = status.HTTP_201_CREATED
                 ) 
     
+    
+class MigrateProfileUpdateCelery(generics.CreateAPIView):
+    serializer_class = ProfileSerializer
+    parser_classes = (MultiPartParser, FormParser,)
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+    def get_queryset(self):
+        # just return the review object
+        return Profile.objects.all()
+    
+    def post(self, request, *args, **kwargs):
         
+        data = request.FILES['file']
+        reader = pd.read_excel(data)
+        dtframe = reader
+        
+        json_data = dtframe.to_json()
+        try:
+            update_profile.delay(json_data)
+        except Exception as e:
+            raise ValidationError(e)
+                    
+        return Response(
+                {'msg':'Loans Migrated Successfuly'},
+                status = status.HTTP_201_CREATED
+                )
+             
 # migrate master savings
 class MigrateMasterSavings(generics.CreateAPIView):
     serializer_class = SavingMasterSerializer
