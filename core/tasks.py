@@ -125,3 +125,32 @@ def upload_loan_deduction(data):
         raise ValueError(f"Invalid value: {e}")
     except TypeError as e:
         raise TypeError(f"Type error: {e}")
+    
+
+# update loan deduction swith correct loan ids
+@shared_task
+def update_loan_deduction_loanids():
+    """
+    Update the 'loan' field of all deductions based on the related loan subscription ID.
+
+    This function loops through all loans, filters deductions based on their
+    subscription ID, and updates their 'loan' field to match the corresponding
+    loan's ID.
+    """
+    loans = Loan.objects.all()
+
+    with transaction.atomic():
+        for loan in loans:
+            deductions = Deduction.objects.filter(deduction_sub_id=loan.sub_id)
+
+            if deductions.exists():
+                deductions.update(loan=loan.id)
+            else:
+                # If there are no deductions for this loan, do nothing
+                pass
+
+    # Move the try-except block outside the with block
+    # try:
+    #     do_something()
+    # except Exception as e:
+    #     raise ValueError(f"Error: {e}")
