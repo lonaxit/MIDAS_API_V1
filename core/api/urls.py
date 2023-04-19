@@ -101,7 +101,9 @@ urlpatterns =[
     path('upload_usersavings/', MigrateUserSavingCelery.as_view(),name='upload_usersavings'),
     path('update_profile/', MigrateProfileUpdateCelery.as_view(),name='update_profile'),
     
-    # path('loans-without-guarantors/', MigrateLoanSubNoGuarantors.as_view(),name='migrate-loans'),
+    path('update_nok/', MigrateProfileNokCelery.as_view(),name='update_nok'),
+    path('update_bank/', MigrateProfileBanksCelery.as_view(),name='update_bank'),
+
     
     path('migrate-mastersaving/', MigrateMasterSavings.as_view(),name='migrate-mastersaving'),
     
