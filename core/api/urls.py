@@ -103,12 +103,11 @@ urlpatterns =[
     
     path('update_nok/', MigrateProfileNokCelery.as_view(),name='update_nok'),
     path('update_bank/', MigrateProfileBanksCelery.as_view(),name='update_bank'),
-     path('upload_master_loan_deduction/', MigrateMasterLoanDeductionCelery.as_view(),name='upload_master_loan_deduction'),
+    path('upload_master_loan_deduction/', MigrateMasterLoanDeductionCelery.as_view(),name='upload_master_loan_deduction'),
+    
+    path('upload_master_saving_deduction/', MigrateMasterSavingDeductionCelery.as_view(),name='upload_master_saving_deduction'),
 
     
-    path('migrate-mastersaving/', MigrateMasterSavings.as_view(),name='migrate-mastersaving'),
-    
-    path('migrate-savings/', MigrateSavings.as_view(),name='migrate-savings'),
-    path('migrate-MasterLoanDeduction/', MigrateMasterLoanDeduction.as_view())
+   
 
 ]
