@@ -142,4 +142,57 @@ def update_profile(data):
             except Profile.DoesNotExist:
                 pass
              
+
+             
+@shared_task
+def update_nok(data):
+    """
+    Update the 'profile'  next of kin details.
+
     
+    """
+    data_frame = pd.read_json(data)
+    
+    # profiles = Profile.objects.all()
+    with transaction.atomic():
+        for  row in data_frame.itertuples():
+            surname = row.first_name
+            firstname = row.last_name
+            othername = row.other_name
+            
+            full_name = surname + ' ' + firstname + ' ' + othername
+            
+            try:
+                # Attempt to get the order for the user
+                profile= Profile.objects.get(user_id=row.user_id)
+                #update profile
+                profile.nok_fullName = full_name
+                profile.nok_relationship = row.relationship
+                profile.nok_phone = row.phone
+                profile.save()
+            except Profile.DoesNotExist:
+                pass
+            
+@shared_task
+def update_bank(data):
+    """
+    Update the 'profile'  next of kin details.
+
+    
+    """
+    data_frame = pd.read_json(data)
+    
+    # profiles = Profile.objects.all()
+    with transaction.atomic():
+        for  row in data_frame.itertuples():
+          
+            
+            try:
+                # Attempt to get the order for the user
+                profile= Profile.objects.get(user_id=row.user_id)
+                #update profile
+                profile.bank = row.bank_name
+                profile.bank_account = row.acct_number
+                profile.save()
+            except Profile.DoesNotExist:
+                pass
