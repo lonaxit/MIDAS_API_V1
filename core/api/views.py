@@ -52,7 +52,7 @@ class ProductListCreate(generics.ListCreateAPIView):
         
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
+    permission_classes =[IsAuthenticated,IsAuthOrReadOnly]
     
     # =========================
     
