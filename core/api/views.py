@@ -32,7 +32,8 @@ from core.tasks import create_loan_subscription, upload_loan_deduction,update_lo
 
 User = get_user_model()
 
-
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 class ProductSchemeListCreate(generics.ListCreateAPIView):
     # ListCreateAPIView gives us both the get and post methods
