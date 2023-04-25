@@ -70,11 +70,11 @@ INSTALLED_APPS = [
 
 CORS_ORIGIN_ALLOW_ALL = False
 
-CORS_ORIGIN_WHITELIST = (
+CORS_ORIGIN_WHITELIST = [
     'https://midastouchonline.co',
-    'https://www.midastouchonline.co',
-    'https://midas-frontend.onrender.com',
-)
+    # 'https://www.midastouchonline.co',
+    # 'https://midas-frontend.onrender.com',
+]
 
 # not working yet
 # CORS_ALLOWED_ORIGINS = [
