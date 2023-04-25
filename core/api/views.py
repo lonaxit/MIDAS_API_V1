@@ -48,21 +48,13 @@ class ProductSchemeDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
     
     # ========================
-# class ProductListCreate(generics.ListCreateAPIView):
+class ProductListCreate(generics.ListCreateAPIView):
         
-#     queryset = Product.objects.all()
-#     serializer_class = ProductSerializer
-#     permission_classes =[IsAuthenticated,IsAuthOrReadOnly]
-    
-class ProductListCreate(generics.RetrieveAPIView):
-      
+    queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes= [IsAuthenticated & IsAuthOrReadOnly]
-  
+    permission_classes =[IsAuthenticated,IsAuthOrReadOnly]
     
-    def get_queryset(self):
-    
-        return Product.objects.all()
+
     
     # =========================
     
