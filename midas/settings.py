@@ -33,7 +33,7 @@ SECRET_KEY = env('SECRET_KEY')
 # for production
 DEBUG = env('DEBUG')
 
-# ALLOWED_HOSTS = ['midasapiv1-production.up.railway.app']
+ALLOWED_HOSTS = ['midasapiv1-production.up.railway.app']
 
 
 # Application definition
@@ -61,8 +61,6 @@ INSTALLED_APPS = [
     'django_celery_results'
  ]
 
-# WORKED
-ALLOWED_HOSTS=['*']
 
 # CORS_ORIGIN_ALLOW_ALL = True
 
@@ -71,24 +69,22 @@ ALLOWED_HOSTS=['*']
 
 # Deprecated  
 # CORS_ORIGIN_ALLOW_ALL = False
+CORS_ALLOW_ALL_ORIGINS = True
 
-# deprecated
 # CORS_ORIGIN_WHITELIST = (
 #     'https://midastouchonline.co',
 #     'https://www.midastouchonline.co',
 #     'https://midas-frontend.onrender.com',
 # )
 
-
-CORS_ALLOWED_ORIGINS = [
-    "https://midastouchonline.co/",
-    "https://www.midastouchonline.co/",
-    "https://midas-frontend.onrender.com/",
-]
+# not working yet
+# CORS_ALLOWED_ORIGINS = [
+#     "https://midastouchonline.co/",
+#     "https://www.midastouchonline.co/",
+#     "https://midas-frontend.onrender.com/",
+# ]
 
 # CORS_ALLOW_ALL_ORIGINS: True
-
-
 
 
 MIDDLEWARE = [
