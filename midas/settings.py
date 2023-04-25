@@ -33,7 +33,7 @@ SECRET_KEY = env('SECRET_KEY')
 # for production
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['midasapiv1-production.up.railway.app']
+# ALLOWED_HOSTS = ['midasapiv1-production.up.railway.app']
 
 
 # Application definition
@@ -62,7 +62,7 @@ INSTALLED_APPS = [
  ]
 
 # WORKED
-# ALLOWED_HOSTS=['*']
+ALLOWED_HOSTS=['*']
 
 # CORS_ORIGIN_ALLOW_ALL = True
 
@@ -81,12 +81,12 @@ INSTALLED_APPS = [
 
 
 CORS_ALLOWED_ORIGINS = [
-    "https://midastouchonline.co",
-    "https://www.midastouchonline.co",
-    "https://midas-frontend.onrender.com",
+    "https://midastouchonline.co/",
+    "https://www.midastouchonline.co/",
+    "https://midas-frontend.onrender.com/",
 ]
 
-CORS_ALLOW_ALL_ORIGINS: True
+# CORS_ALLOW_ALL_ORIGINS: True
 
 
 
