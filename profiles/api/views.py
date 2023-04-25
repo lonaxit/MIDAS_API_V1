@@ -24,6 +24,8 @@ from rest_framework.parsers import MultiPartParser,FormParser
 import openpyxl
 
 from core.api.permissions import *
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 
 
@@ -36,9 +38,16 @@ class ProfileRetrieveUpdate(generics.RetrieveUpdateAPIView):
     
 
 class ProfileList(generics.ListAPIView):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        response = super().dispatch(*args, **kwargs)
+        response["Access-Control-Allow-Origin"] = "https://midastouchonline.co"
+        return response
+    
     queryset = Profile.objects.all()
     serializer_class =ProfileSerializer
     permission_classes = [IsAuthenticated]
+    
     
 
 
