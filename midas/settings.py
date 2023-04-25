@@ -69,20 +69,26 @@ INSTALLED_APPS = [
 
 # ALLOWED_HOSTS=['http://localhost:8080','http://localhost:8000']
 
-               
-CORS_ORIGIN_ALLOW_ALL = False
+# Deprecated  
+# CORS_ORIGIN_ALLOW_ALL = False
 
-CORS_ORIGIN_WHITELIST = (
-    'https://midastouchonline.co',
-    'https://www.midastouchonline.co',
-    'https://midas-frontend.onrender.com',
-)
+# deprecated
+# CORS_ORIGIN_WHITELIST = (
+#     'https://midastouchonline.co',
+#     'https://www.midastouchonline.co',
+#     'https://midas-frontend.onrender.com',
+# )
 
-# config
-# CORS_ALLOWED_ORIGIN=[
-#     'http://localhost:8080',
-#     # 'http://127.0.0.1:8080',
-# ]
+
+CORS_ALLOWED_ORIGINS = [
+    "https://midastouchonline.co",
+    "https://www.midastouchonline.co",
+    "https://midas-frontend.onrender.com",
+]
+
+CORS_ALLOW_ALL_ORIGINS: True
+
+
 
 
 MIDDLEWARE = [
