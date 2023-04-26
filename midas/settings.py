@@ -33,7 +33,8 @@ SECRET_KEY = env('SECRET_KEY')
 # for production
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['midasapiv1-production.up.railway.app']
+# ALLOWED_HOSTS = ['midasapiv1-production.up.railway.app']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
