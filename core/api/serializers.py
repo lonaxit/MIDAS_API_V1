@@ -162,7 +162,7 @@ class LoanSerializer(serializers.ModelSerializer):
     totalCredit =serializers.SerializerMethodField()
     totalDebit =serializers.SerializerMethodField()
   
-    deductions = DeductionSerializer(many=True,read_only=True)
+    # deductions = DeductionSerializer(many=True,read_only=True)
     
     class Meta:
         model = Loan
