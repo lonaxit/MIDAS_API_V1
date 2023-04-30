@@ -229,7 +229,7 @@ class LoansByUser(generics.ListAPIView):
     """
       
     serializer_class = LoanSerializer
-    permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
+    # permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
     lookup_field ='owner'
     
     # over writing default queryset 
