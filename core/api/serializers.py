@@ -240,7 +240,99 @@ class LoanSerializer(serializers.ModelSerializer):
             debit=0
             
         return debit
+
+
+# Loan Detail Serializer
+class LoanDetailSerializer(serializers.ModelSerializer):
     
+    owner = serializers.StringRelatedField()
+    created_by = serializers.StringRelatedField()
+    
+    total_balance = serializers.SerializerMethodField()
+    totaldeduction = serializers.SerializerMethodField()
+    loan_owner = serializers.SerializerMethodField()
+    product_name = serializers.SerializerMethodField()
+    loan_owner_id = serializers.SerializerMethodField()
+    totalCredit =serializers.SerializerMethodField()
+    totalDebit =serializers.SerializerMethodField()
+    deductions = DeductionSerializer(many=True,read_only=True)
+    
+    class Meta:
+        model = Loan
+        fields = "__all__"
+
+    def get_total_balance(self,object):
+        
+        allDeductions = Deduction.objects.filter(loan=object.pk)
+        
+        totalcredit = allDeductions.aggregate(credit=Sum('credit'))
+                        
+        totaldebit = allDeductions.aggregate(debit=Sum('debit'))
+        credit = totalcredit['credit']
+        debit = totaldebit['debit']
+       
+        if not credit:
+            credit=0
+        if not debit:
+            debit=0            
+                        
+        payments = credit - debit
+        
+        return object.approved_amount - payments
+    
+    
+    def get_totaldeduction(self,object):
+        
+        allDeductions = Deduction.objects.filter(loan=object.pk)
+        
+        totalcredit = allDeductions.aggregate(credit=Sum('credit'))
+                        
+        totaldebit = allDeductions.aggregate(debit=Sum('debit'))
+        credit = totalcredit['credit']
+        debit = totaldebit['debit']
+       
+        if not credit:
+            credit=0
+        if not debit:
+            debit=0            
+                        
+        return  credit - debit
+        
+        # return object.approved_amount - payments
+    
+    def get_loan_owner(self,object):
+        
+        Owner = User.objects.get(pk=object.owner.pk)
+        return Owner.last_name + ' ' + Owner.first_name
+    
+    def get_loan_owner_id(self,object):
+            
+        Owner = User.objects.get(pk=object.owner.pk)
+        return Owner.pk
+    
+    def get_product_name(self,object):
+            
+        product = Product.objects.get(pk=object.product.pk)
+        return product.name
+    
+    def get_totalCredit(self,obj):
+            
+        credit = Deduction.objects.filter(loan=obj.pk).aggregate(credit=Sum('credit'))
+        credit = credit['credit']
+        if not credit:
+            credit=0
+            
+        return credit
+    
+    def get_totalDebit(self,obj):
+            
+        debit = Deduction.objects.filter(loan=obj.pk).aggregate(debit=Sum('debit'))
+        
+        debit = debit['debit']
+        if not debit:
+            debit=0
+            
+        return debit
     
 # class ProductSerializer(serializers.ModelSerializer):
 #     loans = LoanSerializer(many=True, read_only=True)

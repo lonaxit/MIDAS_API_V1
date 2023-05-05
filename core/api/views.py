@@ -261,7 +261,7 @@ class LoanDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     
     queryset = Loan.objects.all()
-    serializer_class = LoanSerializer
+    serializer_class = LoanDetailSerializer
     permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
     
 #     # throttle_classes =[UserRateThrottle,AnonRateThrottle]
