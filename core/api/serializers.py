@@ -45,7 +45,6 @@ class DeductionSerializer(serializers.ModelSerializer):
             
             Deductions = Deduction.objects.filter(Q(transaction_date=object.transaction_date) & Q(loan=object.loan.pk) & Q(pk__lte=object.pk)).order_by(F('transaction_date').desc())
     
-        
             totalcredit = Deductions.aggregate(credit=Sum('credit'))
                             
             totaldebit = Deductions.aggregate(debit=Sum('debit'))
