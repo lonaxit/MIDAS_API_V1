@@ -135,7 +135,7 @@ class Deduction(models.Model):
     class Meta:
         
         
-         ordering = ['transaction_date']
+         ordering = ['-transaction_date']
         # get_latest_by = "transaction_date"
     
     def __str__(self):
