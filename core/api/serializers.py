@@ -3,6 +3,7 @@ from rest_framework import serializers
 # import models
 from core.models import *
 from django.db.models import Q, Sum, Avg, Max, Min, Count
+from django.db.models import F
 
 User = get_user_model()
 
@@ -24,11 +25,12 @@ class DeductionSerializer(serializers.ModelSerializer):
     def get_loan_balance(self,object):
         
         
-        allDeductions = Deduction.objects.filter(Q(transaction_date = object.transaction_date) & Q(loan=object.loan.pk))
+        # allDeductions = Deduction.objects.filter(Q(transaction_date = object.transaction_date) & Q(loan=object.loan.pk))
+        allDeductions = Deduction.objects.filter(Q(transaction_date=object.transaction_date) & Q(loan=object.loan.pk)).order_by(F('date').desc())
         
         if (allDeductions.count() > 1):
             # select records greater than this date
-            GreaterDeductions = Deduction.objects.filter(Q(transaction_date__gt=object.transaction_date) & Q(loan=object.loan.pk))
+            GreaterDeductions = Deduction.objects.filter(Q(transaction_date__gt=object.transaction_date) & Q(loan=object.loan.pk)).order_by(F('date').desc())
             
             totalcredit = GreaterDeductions.aggregate(credit=Sum('credit'))
                             
@@ -41,7 +43,7 @@ class DeductionSerializer(serializers.ModelSerializer):
             if not Greaterdebit:
                 Greaterdebit=0 
             
-            Deductions = Deduction.objects.filter(Q(transaction_date=object.transaction_date) & Q(loan=object.loan.pk) & Q(pk__lte=object.pk))
+            Deductions = Deduction.objects.filter(Q(transaction_date=object.transaction_date) & Q(loan=object.loan.pk) & Q(pk__lte=object.pk)).order_by(F('date').desc())
     
         
             totalcredit = Deductions.aggregate(credit=Sum('credit'))
@@ -60,7 +62,7 @@ class DeductionSerializer(serializers.ModelSerializer):
             return object.loan.approved_amount-payments
             
         
-        all_Deductions = Deduction.objects.filter(Q(transaction_date__gte= object.transaction_date) & Q(loan=object.loan.pk))
+        all_Deductions = Deduction.objects.filter(Q(transaction_date__gte= object.transaction_date) & Q(loan=object.loan.pk)).order_by(F('date').desc())
         
         totalcredit = all_Deductions.aggregate(credit=Sum('credit'))
                             
