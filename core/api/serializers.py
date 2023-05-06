@@ -26,11 +26,11 @@ class DeductionSerializer(serializers.ModelSerializer):
         
         
         # allDeductions = Deduction.objects.filter(Q(transaction_date = object.transaction_date) & Q(loan=object.loan.pk))
-        allDeductions = Deduction.objects.filter(Q(transaction_date=object.transaction_date) & Q(loan=object.loan.pk)).order_by(F('date').desc())
+        allDeductions = Deduction.objects.filter(Q(transaction_date=object.transaction_date) & Q(loan=object.loan.pk)).order_by(F('transaction_date').desc())
         
         if (allDeductions.count() > 1):
             # select records greater than this date
-            GreaterDeductions = Deduction.objects.filter(Q(transaction_date__gt=object.transaction_date) & Q(loan=object.loan.pk)).order_by(F('date').desc())
+            GreaterDeductions = Deduction.objects.filter(Q(transaction_date__gt=object.transaction_date) & Q(loan=object.loan.pk)).order_by(F('transaction_date').desc())
             
             totalcredit = GreaterDeductions.aggregate(credit=Sum('credit'))
                             
@@ -43,7 +43,7 @@ class DeductionSerializer(serializers.ModelSerializer):
             if not Greaterdebit:
                 Greaterdebit=0 
             
-            Deductions = Deduction.objects.filter(Q(transaction_date=object.transaction_date) & Q(loan=object.loan.pk) & Q(pk__lte=object.pk)).order_by(F('date').desc())
+            Deductions = Deduction.objects.filter(Q(transaction_date=object.transaction_date) & Q(loan=object.loan.pk) & Q(pk__lte=object.pk)).order_by(F('transaction_date').desc())
     
         
             totalcredit = Deductions.aggregate(credit=Sum('credit'))
@@ -62,7 +62,7 @@ class DeductionSerializer(serializers.ModelSerializer):
             return object.loan.approved_amount-payments
             
         
-        all_Deductions = Deduction.objects.filter(Q(transaction_date__gte= object.transaction_date) & Q(loan=object.loan.pk)).order_by(F('date').desc())
+        all_Deductions = Deduction.objects.filter(Q(transaction_date__gte= object.transaction_date) & Q(loan=object.loan.pk)).order_by(F('transaction_date').desc())
         
         totalcredit = all_Deductions.aggregate(credit=Sum('credit'))
                             
