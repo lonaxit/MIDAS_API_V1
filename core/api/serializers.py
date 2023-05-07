@@ -18,7 +18,7 @@ class DeductionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Deduction
         fields = "__all__"
-        ordering=['-transaction_date']
+        # ordering=['-transaction_date']
         
     def get_loan_id(self,object):
         return object.loan.pk
