@@ -18,12 +18,17 @@ class DeductionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Deduction
         fields = "__all__"
-        ordering=['-transaction_date']
+        ordering=['transaction_date']
         
     def get_loan_id(self,object):
         return object.loan.pk
         
     # def get_loan_balance(self,object):
+        # previous_balances = Deduction.objects.filter(transaction_date__lt=obj.transaction_date)
+        # total_debits = previous_balances.aggregate(total_debits=Sum('debit'))['total_debits'] or 0
+        # total_credits = previous_balances.aggregate(total_credits=Sum('credit'))['total_credits'] or 0
+        #trnxDiff = total_credits - total_debits
+        # return loan.approved_amount-trnxDiff
         
         
        
