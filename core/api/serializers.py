@@ -9,7 +9,7 @@ User = get_user_model()
 
 
 class DeductionSerializer(serializers.ModelSerializer):
-    loan_balance = serializers.SerializerMethodField()
+    # loan_balance = serializers.SerializerMethodField()
     loan = serializers.CharField(source='loan.product.name') 
     loanee = serializers.StringRelatedField()
     created_by = serializers.StringRelatedField()
@@ -18,65 +18,66 @@ class DeductionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Deduction
         fields = "__all__"
+        ordering=['-transaction_date']
         
     def get_loan_id(self,object):
         return object.loan.pk
         
-    def get_loan_balance(self,object):
+    # def get_loan_balance(self,object):
         
         
-        # allDeductions = Deduction.objects.filter(Q(transaction_date = object.transaction_date) & Q(loan=object.loan.pk))
-        allDeductions = Deduction.objects.filter(Q(transaction_date=object.transaction_date) & Q(loan=object.loan.pk))
+       
+    #     allDeductions = Deduction.objects.filter(Q(transaction_date=object.transaction_date) & Q(loan=object.loan.pk))
         
-        if (allDeductions.count() > 1):
-            # select records greater than this date
-            GreaterDeductions = Deduction.objects.filter(Q(transaction_date__gt=object.transaction_date) & Q(loan=object.loan.pk))
+    #     if (allDeductions.count() > 1):
+    #         # select records greater than this date
+    #         GreaterDeductions = Deduction.objects.filter(Q(transaction_date__lt=object.transaction_date) & Q(loan=object.loan.pk))
             
-            totalcredit = GreaterDeductions.aggregate(credit=Sum('credit'))
+    #         totalcredit = GreaterDeductions.aggregate(credit=Sum('credit'))
                             
-            totaldebit = GreaterDeductions.aggregate(debit=Sum('debit'))
-            Greatercredit = totalcredit['credit']
-            Greaterdebit = totaldebit['debit']
+    #         totaldebit = GreaterDeductions.aggregate(debit=Sum('debit'))
+    #         Greatercredit = totalcredit['credit']
+    #         Greaterdebit = totaldebit['debit']
         
-            if not Greatercredit:
-                Greatercredit=0
-            if not Greaterdebit:
-                Greaterdebit=0 
+    #         if not Greatercredit:
+    #             Greatercredit=0
+    #         if not Greaterdebit:
+    #             Greaterdebit=0 
             
-            Deductions = Deduction.objects.filter(Q(transaction_date=object.transaction_date) & Q(loan=object.loan.pk) & Q(pk__lte=object.pk))
+    #         Deductions = Deduction.objects.filter(Q(transaction_date=object.transaction_date) & Q(loan=object.loan.pk) & Q(pk__lte=object.pk))
     
-            totalcredit = Deductions.aggregate(credit=Sum('credit'))
+    #         totalcredit = Deductions.aggregate(credit=Sum('credit'))
                             
-            totaldebit = Deductions.aggregate(debit=Sum('debit'))
-            credit = totalcredit['credit']
-            debit = totaldebit['debit']
+    #         totaldebit = Deductions.aggregate(debit=Sum('debit'))
+    #         credit = totalcredit['credit']
+    #         debit = totaldebit['debit']
         
-            if not credit:
-                credit=0
-            if not debit:
-                debit=0            
+    #         if not credit:
+    #             credit=0
+    #         if not debit:
+    #             debit=0            
                             
-            payments = credit + Greatercredit - debit+Greaterdebit
+    #         payments = credit + Greatercredit - debit+Greaterdebit
         
-            return object.loan.approved_amount-payments
+    #         return object.loan.approved_amount-payments
             
         
-        all_Deductions = Deduction.objects.filter(Q(transaction_date__gte= object.transaction_date) & Q(loan=object.loan.pk))
+    #     all_Deductions = Deduction.objects.filter(Q(transaction_date__gte= object.transaction_date) & Q(loan=object.loan.pk))
         
-        totalcredit = all_Deductions.aggregate(credit=Sum('credit'))
+    #     totalcredit = all_Deductions.aggregate(credit=Sum('credit'))
                             
-        totaldebit = all_Deductions.aggregate(debit=Sum('debit'))
-        credit = totalcredit['credit']
-        debit = totaldebit['debit']
+    #     totaldebit = all_Deductions.aggregate(debit=Sum('debit'))
+    #     credit = totalcredit['credit']
+    #     debit = totaldebit['debit']
         
-        if not credit:
-            credit=0
-        if not debit:
-            debit=0            
+    #     if not credit:
+    #         credit=0
+    #     if not debit:
+    #         debit=0            
                             
-        payments = credit - debit
+    #     payments = credit - debit
         
-        return object.loan.approved_amount-payments
+    #     return object.loan.approved_amount-payments
         
         
     
