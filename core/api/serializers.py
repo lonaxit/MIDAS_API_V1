@@ -634,11 +634,11 @@ class SavingSerializer(serializers.ModelSerializer):
     def get_balance(self,object):
         
         
-        allDeductions = Saving.objects.filter(Q(transaction_date = object.transaction_date) & Q(user=object.user.pk))
+        allDeposit = Saving.objects.filter(Q(transaction_date = object.transaction_date) & Q(user=object.user.pk))
         
-        if (allDeductions.count() > 1):
+        if (allDeposit.count() > 1):
             # select records greater than this date
-            GreaterDeductions = Saving.objects.filter(Q(transaction_date__gt=object.transaction_date) & Q(user=object.user.pk))
+            GreaterDeductions = Saving.objects.filter(Q(transaction_date__lt=object.transaction_date) & Q(user=object.user.pk))
             
             totalcredit = GreaterDeductions.aggregate(credit=Sum('credit'))
                             
@@ -670,7 +670,7 @@ class SavingSerializer(serializers.ModelSerializer):
             return payments
             
         
-        all_Deductions = Saving.objects.filter(Q(transaction_date__gte= object.transaction_date) & Q(user=object.user.pk))
+        all_Deductions = Saving.objects.filter(Q(transaction_date__lte= object.transaction_date) & Q(user=object.user.pk))
         
         totalcredit = all_Deductions.aggregate(credit=Sum('credit'))
                             
