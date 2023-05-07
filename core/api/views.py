@@ -784,6 +784,7 @@ class ListUserSavings(generics.ListAPIView):
             # get_queryset shoud not return a response
             # return Response({'Error': 'Movie Not Found'},status=status.HTTP_404_NOT_FOUND)
             raise ValidationError('User Does Not exist')
+        
   
 #  find statement of saving given a user id and date range start and end dates 
 class StatementofSavings(generics.ListAPIView):
