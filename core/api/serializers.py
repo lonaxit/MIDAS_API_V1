@@ -28,7 +28,7 @@ class DeductionSerializer(serializers.ModelSerializer):
         total_debits = previous_balances.aggregate(total_debits=Sum('debit'))['total_debits'] or 0
         total_credits = previous_balances.aggregate(total_credits=Sum('credit'))['total_credits'] or 0
         trnxDiff = total_credits - total_debits
-        return object.loan.approved_amount-trnxDiff
+        return object.loan.approved_amount
         
         
        
