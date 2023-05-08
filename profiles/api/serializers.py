@@ -24,7 +24,22 @@ class ProfileSerializer(serializers.ModelSerializer):
     #     me = User.objects.filter(pk=object.user.pk)
     #     return me
 
-       
+class ProfileListSerializer(serializers.ModelSerializer):
+    
+    user = serializers.StringRelatedField(read_only=True)
+    avatar = serializers.ImageField(read_only=True)
+    # user = UserSerializer(read_only=True)
+    # user = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Profile 
+        fields= "__all__"
+        
+    # def get_user(self,object):
+           
+    #     me = User.objects.filter(pk=object.user.pk)
+    #     return me
+
         
         
 # used only to update the profile image
