@@ -9,6 +9,14 @@ from core.api.serializers import *
 User = get_user_model()
 
 # user app
+class UserProfileSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = User
+        exclude=('groups','user_permissions','last_login','password')
+        
+   
+        
 class UserSerializer(serializers.ModelSerializer):
     
     savinguser = SavingSerializer(many=True,read_only=True)
