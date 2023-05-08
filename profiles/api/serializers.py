@@ -28,6 +28,7 @@ class ProfileListSerializer(serializers.ModelSerializer):
     
     user = serializers.StringRelatedField(read_only=True)
     avatar = serializers.ImageField(read_only=True)
+    user = UserProfileSerializer(read_only=True)
     # user = UserSerializer(read_only=True)
     # user = serializers.SerializerMethodField()
     
