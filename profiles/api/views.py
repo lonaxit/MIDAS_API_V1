@@ -42,7 +42,10 @@ class ProfileList(generics.ListAPIView):
     serializer_class =ProfileSerializer
     permission_classes = [IsAuthenticated]
     
-    
+class GetProfileList(generics.ListAPIView):
+    queryset = Profile.objects.all()
+    serializer_class =  ProfileListSerializer
+    permission_classes = [IsAuthenticated]  
 
 
 # Get a user's profile detail 
