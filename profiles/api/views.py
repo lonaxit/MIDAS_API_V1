@@ -60,6 +60,17 @@ class GetProfile(generics.RetrieveAPIView):
     
         return Profile.objects.all()
 
+# 
+class UserProfileView(generics.RetrieveAPIView):
+    serializer_class = ProfileListSerializer
+    permission_classes= [IsAuthenticated & IsAuthOrReadOnly]
+
+    def get_object(self):
+        # return self.request.user.profile
+        user = self.request.user
+        
+        return Profile.objects.filter(user=user)
+
 
 
 # search user using the search bar
