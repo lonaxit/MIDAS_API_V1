@@ -634,10 +634,10 @@ class MasterSavingUpload(generics.CreateAPIView):
                     savingMasterObj = SavingMaster.objects.create(  
                                         name= dtframe.NAME,
                                         ippis_number = dtframe.IPPIS_NUMBER,
-                                        narration = dtframe.NARRATION,
+                                        narration = dtframe.DESCRIPTION,
                                         transaction_date = dtframe.DATE,
                                         transaction_code = random_number,
-                                        amount = dtframe.AMOUNT,
+                                        amount = dtframe.CONTRIBUTION,
                                         upload_by=request.user,
                                         )
 
