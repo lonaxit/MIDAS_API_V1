@@ -620,7 +620,7 @@ class MasterSavingUpload(generics.CreateAPIView):
            
             try:
                 
-                total_cumulative = dtframe.AMOUNT.sum()
+                total_cumulative = dtframe.CONTRIBUTION.sum()
             
 
                 
