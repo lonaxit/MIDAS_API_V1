@@ -662,7 +662,7 @@ class MasterSavingUpload(generics.CreateAPIView):
                 )
 
 class ListMasterSaving(generics.ListAPIView):
-    queryset = SavingMaster.objects.all().order_by('transaction_date')
+    queryset = SavingMaster.objects.filter(active=True).order_by('transaction_date')
     serializer_class = SavingMasterSerializer
     permission_classes=[IsAuthenticated & IsAuthOrReadOnly]
 
