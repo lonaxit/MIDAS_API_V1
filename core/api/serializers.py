@@ -355,7 +355,7 @@ class LoanDetailSerializer(serializers.ModelSerializer):
 #         fields= '__all__'
         
 class ProductSerializer(serializers.ModelSerializer):
-    loans = LoanSerializer(many=True, read_only=True)
+    # loans = LoanSerializer(many=True, read_only=True)
     # product_scheme = serializers.StringRelatedField(read_only=True)
     scheme = serializers.SerializerMethodField()
 
