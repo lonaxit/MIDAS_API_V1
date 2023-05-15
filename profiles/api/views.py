@@ -61,6 +61,17 @@ class GetProfile(generics.RetrieveAPIView):
     
         return Profile.objects.all()
 
+class GetProfileMobile(generics.RetrieveAPIView):
+  
+    # serializer_class = ProfileSerializer
+    serializer_class = ProfileListSerializer
+    permission_classes= [IsAuthenticated & IsAuthOrReadOnly]
+    lookup_field ='user'
+    
+    def get_queryset(self):
+    
+        return Profile.objects.all()
+
 # 
 class UserProfileView(generics.RetrieveAPIView):
     serializer_class = ProfileListSerializer
