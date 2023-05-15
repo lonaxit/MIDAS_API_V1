@@ -51,8 +51,9 @@ class GetProfileList(generics.ListAPIView):
 # Get a user's profile detail 
 class GetProfile(generics.RetrieveAPIView):
   
-    # serializer_class = ProfileSerializer
-    serializer_class = ProfileListSerializer
+    serializer_class = ProfileSerializer
+    # serializer_class = ProfileListSerializer
+  
     permission_classes= [IsAuthenticated & IsAuthOrReadOnly]
     lookup_field ='user'
     
