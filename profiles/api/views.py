@@ -43,7 +43,7 @@ class ProfileList(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     
 class GetProfileList(generics.ListAPIView):
-    queryset = Profile.objects.all()
+    queryset = Profile.objects.all().order_by('user')
     serializer_class =  ProfileListSerializer
     permission_classes = [IsAuthenticated]  
 
