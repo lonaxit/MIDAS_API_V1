@@ -719,6 +719,51 @@ class CreateBulkSaving(generics.CreateAPIView):
         else:
             raise ValidationError('No unprocessed savings yet!')
 
+# upload saving withdrawal
+# class uploadSavingWithdrawal(generics.CreateAPIView):
+#     serializer_class = SavingSerializer
+#     parser_classes = (MultiPartParser, FormParser,)
+#     permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+#     def get_queryset(self):
+#         # just return the review object
+#         return Saving.objects.all()
+    
+#     def post(self, request, *args, **kwargs):
+        
+#         data = request.FILES['file']
+#         reader = pd.read_excel(data)
+#         dtframe = reader
+        
+#         # json_data = dtframe.to_json()
+#         try:
+                    
+#             user = User.objects.get(ippis_number=master.ippis_number)
+                            
+#             Saving.objects.create(  
+#                         user=user,
+#                         credit = master.amount,
+#                         narration = master.narration,
+#                         transaction_date = master.transaction_date,
+#                         transaction_code = master.transaction_code,
+#                         created_by=request.user,
+#                         )  
+                 
+    
+#         except User.DoesNotExist:
+            
+#             raise ValidationError(e)
+#         # try:
+#         #     userid = request.user.id
+#         #     upload_master_saving.delay(userid,json_data)
+#         # except Exception as e:
+#         #     raise ValidationError(e)
+                    
+#         return Response(
+#                 {'msg':'Master Deductions Migrated Successfuly'},
+#                 status = status.HTTP_201_CREATED
+#                 ) 
+
 # saving list
 class SavingsList(generics.ListAPIView):
     serializer_class = SavingSerializer
