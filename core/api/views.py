@@ -829,7 +829,52 @@ class ListUserSavings(generics.ListAPIView):
             # get_queryset shoud not return a response
             # return Response({'Error': 'Movie Not Found'},status=status.HTTP_404_NOT_FOUND)
             raise ValidationError('User Does Not exist')
+
+    # List Loans guaranteed as first guarantor
+class ListGuaranteeLoans(generics.ListAPIView):
+    
         
+    serializer_class = LoanSerializer
+    queryset = Loan.objects.all()
+    permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
+            
+    def get_queryset(self):
+        
+        guarantor_id = self.kwargs['guarantor_id']
+        return Loan.objects.filter(Q(guarantor_one=guarantor_id) | Q(guarantor_two=guarantor_id))
+    
+    
+    
+class ListSecondGuarantor(generics.ListAPIView):
+        
+    serializer_class = LoanSerializer
+    queryset = Loan.objects.all()
+    permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
+            
+    def get_queryset(self):
+        guarantor_two_id = self.kwargs['guarantor_two_id']
+        return Loan.objects.filter(guarantor_one=guarantor_two_id)
+    
+    
+    
+    
+    
+    # def get_queryset(self):
+        
+    #     pk = self.kwargs['pk']
+    #     try:
+    #         # user = User.objects.get(pk=pk)
+    #         Loans = Loan.objects.filter(guarantor_one=pk)
+            
+    #         if not Loans:
+    #             raise ValidationError('No Saving(s) For This User')
+    #         return Loans
+        
+    #     except User.DoesNotExist:          
+
+    #         # get_queryset shoud not return a response
+    #         # return Response({'Error': 'Movie Not Found'},status=status.HTTP_404_NOT_FOUND)
+    #         raise ValidationError('User Does Not exist') 
   
 #  find statement of saving given a user id and date range start and end dates 
 class StatementofSavings(generics.ListAPIView):
