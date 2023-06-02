@@ -84,6 +84,12 @@ urlpatterns =[
      # User Opening Balance 
     path('<int:pk>/<str:startdate>/deposit-opening/balance/',UserOpeningBalance.as_view(),name="deposit=opening-balance"),
     
+    # loans guaranteed
+   
+    path('loans/guarantor/<int:guarantor_id>/',ListGuaranteeLoans.as_view(), name='loans-by-guarantor'),
+    
+    #  path('loans/guarantor-two/<int:guarantor_one_id>/', ListFirstGuarantor.as_view(), name='loans-by-guarantor-one'),
+    
     
     
     # db migration
