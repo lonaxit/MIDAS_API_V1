@@ -88,7 +88,7 @@ urlpatterns =[
    
     path('loans/guarantor/<int:guarantor_id>/',ListGuaranteeLoans.as_view(), name='loans-by-guarantor'),
     
-    #  path('loans/guarantor-two/<int:guarantor_one_id>/', ListFirstGuarantor.as_view(), name='loans-by-guarantor-one'),
+ 
     
     
     
