@@ -221,7 +221,7 @@ class LoanSerializer(serializers.ModelSerializer):
     def get_loan_owner(self,object):
         
         Owner = User.objects.get(pk=object.owner.pk)
-        return Owner.last_name + ' ' + Owner.first_name
+        return Owner.last_name.uppercase() + ' ' + Owner.first_name.lowercase()
     
     def get_loan_owner_id(self,object):
             
