@@ -417,7 +417,7 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
             for master in masterDeductions:
                 
                 try:
-                    
+                    # total cumulative deduction
                     ippis_Deduction = master.cumulative_amount
                     
                     profile = Profile.objects.get(ippis=master.ippis_number)
