@@ -24,6 +24,8 @@ from rest_framework.parsers import MultiPartParser,FormParser
 import openpyxl
 
 from core.api.permissions import *
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 
 
@@ -40,18 +42,46 @@ class ProfileList(generics.ListAPIView):
     serializer_class =ProfileSerializer
     permission_classes = [IsAuthenticated]
     
+class GetProfileList(generics.ListAPIView):
+    queryset = Profile.objects.all().order_by('user')
+    serializer_class =  ProfileListSerializer
+    permission_classes = [IsAuthenticated]  
 
 
 # Get a user's profile detail 
 class GetProfile(generics.RetrieveAPIView):
   
     serializer_class = ProfileSerializer
+    # serializer_class = ProfileListSerializer
+  
     permission_classes= [IsAuthenticated & IsAuthOrReadOnly]
     lookup_field ='user'
     
     def get_queryset(self):
     
         return Profile.objects.all()
+
+class GetProfileMobile(generics.RetrieveAPIView):
+  
+    # serializer_class = ProfileSerializer
+    serializer_class = ProfileListSerializer
+    permission_classes= [IsAuthenticated & IsAuthOrReadOnly]
+    lookup_field ='user'
+    
+    def get_queryset(self):
+    
+        return Profile.objects.all()
+
+# 
+class UserProfileView(generics.RetrieveAPIView):
+    serializer_class = ProfileListSerializer
+    permission_classes= [IsAuthenticated & IsAuthOrReadOnly]
+
+    def get_object(self):
+        # return self.request.user.profile
+        user = self.request.user
+        
+        return Profile.objects.filter(user=user)
 
 
 

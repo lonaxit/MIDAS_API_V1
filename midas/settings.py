@@ -33,7 +33,7 @@ SECRET_KEY = env('SECRET_KEY')
 # for production
 DEBUG = env('DEBUG')
 
-# ALLOWED_HOSTS = ['midasapiv1-production.up.railway.app']
+ALLOWED_HOSTS = ['midasapiv1-production.up.railway.app']
 
 
 # Application definition
@@ -61,28 +61,41 @@ INSTALLED_APPS = [
     'django_celery_results'
  ]
 
-# WORKED
-ALLOWED_HOSTS=['*']
 
 # CORS_ORIGIN_ALLOW_ALL = True
 
 
 # ALLOWED_HOSTS=['http://localhost:8080','http://localhost:8000']
 
-               
-CORS_ORIGIN_ALLOW_ALL = False
 
-CORS_ORIGIN_WHITELIST = (
-    'https://midastouchonline.co',
-    'https://www.midastouchonline.co',
-    'https://midas-frontend.onrender.com',
-)
+CORS_ORIGIN_ALLOW_ALL = True
 
-# config
-# CORS_ALLOWED_ORIGIN=[
-#     'http://localhost:8080',
-#     # 'http://127.0.0.1:8080',
-# ]
+# CORS_ORIGIN_WHITELIST = (
+#     'https://midastouchonline.co',
+# )
+
+CORS_ALLOW_ALL_ORIGINS: False
+
+CORS_ALLOWED_ORIGINS = [
+    "https://midastouchonline.co",
+    # "https://www.midastouchonline.co",
+    # "https://midas-frontend.onrender.com",
+]
+
+# Allow all headers
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+
 
 
 MIDDLEWARE = [
@@ -135,18 +148,6 @@ WSGI_APPLICATION = 'midas.wsgi.application'
 
 # production
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME':'railway',
-#         'USER': 'postgres',
-#         'PASSWORD':'IATtrypy9yzd2ITLRCQ5',
-#         'HOST':'containers-us-west-18.railway.app',
-#         'PORT':'5435',
-#     }
-# }
-
-# railway deployment
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -158,10 +159,8 @@ DATABASES = {
     }
 }
 
-# render deployment
-
 # DATABASES={
-#     'default': dj_database_url.config(env('RAILWAY_DATABASE_URL'))
+#     'default': dj_database_url.config(env('DB_URL'))
 # }
 
 # Password validation
@@ -223,15 +222,17 @@ SPECTACULAR_SETTINGS = {
 # custom user
 AUTH_USER_MODEL = 'users.CustomUser'
 
-
+# Celery Settings
 # railway
 CELERY_BROKER_URL='redis://default:BTKBUIj4ZRHdEDrOZGD3@containers-us-west-181.railway.app:5990'
-
 # Set up on render
 # CELERY_BROKER_URL = 'rediss://red-cgspo09jvhtrd2744bcg:FxktDLe9tDuiLaIpaasTVzXCQI8SrWN8@oregon-redis.render.com:6379'
 CELERY_ACCEPT_CONTENT= ['application/json']
 CELERY_RESULT_SERIALIZER='json'
 CELERY_TASK_SERIALIZER ='json'
-# CELERY_TIMEZONE='UTC',
-CELERY_TIMEZONE = 'Africa/Lagos'
+CELERY_TIMEZONE='UTC'
 CELERY_RESULT_BACKEND = 'django-db'
+
+# CELERY_IMPORTS = (
+#     'core.tasks',
+# )

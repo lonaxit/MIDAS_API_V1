@@ -89,6 +89,8 @@ class MasterLoanDeduction(models.Model):
     active = models.BooleanField(default=True)
     transaction_code = models.BigIntegerField()
     cumulative_amount = models.DecimalField(max_digits=20,decimal_places=2)
+    # balance = models.DecimalField(max_digits=20,decimal_places=2,null=True)
+    
     created_by = models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name='masterloandeduction')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -121,15 +123,17 @@ class Deduction(models.Model):
     loan = models.ForeignKey(Loan, on_delete=models.CASCADE,related_name='deductions')
     credit = models.DecimalField(max_digits=20,decimal_places=2,null=True,blank=True)
     debit = models.DecimalField(max_digits=20,decimal_places=2,null=True,blank=True)
+    # balance = models.DecimalField(max_digits=20,decimal_places=2)
     narration = models.CharField(max_length=250)
     transaction_code = models.BigIntegerField()
-    deduction_sub_id = models.IntegerField(null=True, blank=True)
     transaction_date = models.DateField()
+    deduction_sub_id = models.IntegerField(null=True, blank=True)
     created_by = models.ForeignKey(User,on_delete=models.DO_NOTHING)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     
     class Meta:
+        
          ordering = ['-transaction_date']
         # get_latest_by = "transaction_date"
     

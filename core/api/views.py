@@ -6,6 +6,7 @@ import json
 import io, csv, pandas as pd
 from users.serializers import *
 from core.api.serializers import *
+from profiles.api.serializers import *
 from core.api.permissions import *
 from core.api.utilities import *
 # # import models
@@ -27,8 +28,8 @@ from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser,FormParser
 
 import openpyxl
+from core.tasks import create_loan_subscription, upload_loan_deduction,update_loan_deduction_loanids,upload_user_savings,update_profile,update_nok,update_bank,upload_master_loan_deduction,upload_master_saving
 
-# from core.tasks import create_loan_subscription, mul
 User = get_user_model()
 
 
@@ -51,7 +52,9 @@ class ProductListCreate(generics.ListCreateAPIView):
         
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
+    permission_classes =[IsAuthenticated,IsAuthOrReadOnly]
+    
+
     
     # =========================
     
@@ -226,7 +229,7 @@ class LoansByUser(generics.ListAPIView):
     """
       
     serializer_class = LoanSerializer
-    permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
     lookup_field ='owner'
     
     # over writing default queryset 
@@ -258,7 +261,7 @@ class LoanDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     
     queryset = Loan.objects.all()
-    serializer_class = LoanSerializer
+    serializer_class = LoanDetailSerializer
     permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
     
 #     # throttle_classes =[UserRateThrottle,AnonRateThrottle]
@@ -414,7 +417,7 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
             for master in masterDeductions:
                 
                 try:
-                    
+                    # total cumulative deduction
                     ippis_Deduction = master.cumulative_amount
                     
                     profile = Profile.objects.get(ippis=master.ippis_number)
@@ -617,7 +620,7 @@ class MasterSavingUpload(generics.CreateAPIView):
            
             try:
                 
-                total_cumulative = dtframe.AMOUNT.sum()
+                total_cumulative = dtframe.CONTRIBUTION.sum()
             
 
                 
@@ -631,10 +634,10 @@ class MasterSavingUpload(generics.CreateAPIView):
                     savingMasterObj = SavingMaster.objects.create(  
                                         name= dtframe.NAME,
                                         ippis_number = dtframe.IPPIS_NUMBER,
-                                        narration = dtframe.NARRATION,
+                                        narration = dtframe.DESCRIPTION,
                                         transaction_date = dtframe.DATE,
                                         transaction_code = random_number,
-                                        amount = dtframe.AMOUNT,
+                                        amount = dtframe.CONTRIBUTION,
                                         upload_by=request.user,
                                         )
 
@@ -659,7 +662,7 @@ class MasterSavingUpload(generics.CreateAPIView):
                 )
 
 class ListMasterSaving(generics.ListAPIView):
-    queryset = SavingMaster.objects.all().order_by('transaction_date')
+    queryset = SavingMaster.objects.filter(active=True).order_by('transaction_date')
     serializer_class = SavingMasterSerializer
     permission_classes=[IsAuthenticated & IsAuthOrReadOnly]
 
@@ -715,6 +718,51 @@ class CreateBulkSaving(generics.CreateAPIView):
                 )
         else:
             raise ValidationError('No unprocessed savings yet!')
+
+# upload saving withdrawal
+# class uploadSavingWithdrawal(generics.CreateAPIView):
+#     serializer_class = SavingSerializer
+#     parser_classes = (MultiPartParser, FormParser,)
+#     permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+#     def get_queryset(self):
+#         # just return the review object
+#         return Saving.objects.all()
+    
+#     def post(self, request, *args, **kwargs):
+        
+#         data = request.FILES['file']
+#         reader = pd.read_excel(data)
+#         dtframe = reader
+        
+#         # json_data = dtframe.to_json()
+#         try:
+                    
+#             user = User.objects.get(ippis_number=master.ippis_number)
+                            
+#             Saving.objects.create(  
+#                         user=user,
+#                         credit = master.amount,
+#                         narration = master.narration,
+#                         transaction_date = master.transaction_date,
+#                         transaction_code = master.transaction_code,
+#                         created_by=request.user,
+#                         )  
+                 
+    
+#         except User.DoesNotExist:
+            
+#             raise ValidationError(e)
+#         # try:
+#         #     userid = request.user.id
+#         #     upload_master_saving.delay(userid,json_data)
+#         # except Exception as e:
+#         #     raise ValidationError(e)
+                    
+#         return Response(
+#                 {'msg':'Master Deductions Migrated Successfuly'},
+#                 status = status.HTTP_201_CREATED
+#                 ) 
 
 # saving list
 class SavingsList(generics.ListAPIView):
@@ -781,6 +829,52 @@ class ListUserSavings(generics.ListAPIView):
             # get_queryset shoud not return a response
             # return Response({'Error': 'Movie Not Found'},status=status.HTTP_404_NOT_FOUND)
             raise ValidationError('User Does Not exist')
+
+    # List Loans guaranteed as first guarantor
+class ListGuaranteeLoans(generics.ListAPIView):
+    
+        
+    serializer_class = LoanSerializer
+    queryset = Loan.objects.all()
+    permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
+            
+    def get_queryset(self):
+        
+        guarantor_id = self.kwargs['guarantor_id']
+        return Loan.objects.filter(Q(guarantor_one=guarantor_id) | Q(guarantor_two=guarantor_id))
+    
+    
+    
+class ListSecondGuarantor(generics.ListAPIView):
+        
+    serializer_class = LoanSerializer
+    queryset = Loan.objects.all()
+    permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
+            
+    def get_queryset(self):
+        guarantor_two_id = self.kwargs['guarantor_two_id']
+        return Loan.objects.filter(guarantor_one=guarantor_two_id)
+    
+    
+    
+    
+    
+    # def get_queryset(self):
+        
+    #     pk = self.kwargs['pk']
+    #     try:
+    #         # user = User.objects.get(pk=pk)
+    #         Loans = Loan.objects.filter(guarantor_one=pk)
+            
+    #         if not Loans:
+    #             raise ValidationError('No Saving(s) For This User')
+    #         return Loans
+        
+    #     except User.DoesNotExist:          
+
+    #         # get_queryset shoud not return a response
+    #         # return Response({'Error': 'Movie Not Found'},status=status.HTTP_404_NOT_FOUND)
+    #         raise ValidationError('User Does Not exist') 
   
 #  find statement of saving given a user id and date range start and end dates 
 class StatementofSavings(generics.ListAPIView):
@@ -1043,26 +1137,20 @@ class loanMigrationCelery(generics.CreateAPIView):
         
         data = request.FILES['file']
         reader = pd.read_excel(data)
-        user_id = request.user.id
         dtframe = reader
         
         json_data = dtframe.to_json()
         # data = json.loads(json_data)
 
-        # # convert the JSON data to a DataFrame
-        # df = pd.read_json(json.dumps(data))
         
         with transaction.atomic():
             
-            data_frame = pd.read_json(json_data)
-            
-            print(data_frame)
-            
-            
+            # data_frame = pd.read_json(json_data)
             # try:
-            print(json_data)
-            # create_loan_subscription.delay(json_data)
-                  
+            # print(json_data)
+            # mul(5,10,2)
+            create_loan_subscription.delay(json_data)
+           
             # except Exception as e:
             #     raise ValidationError(e)
            
@@ -1071,143 +1159,9 @@ class loanMigrationCelery(generics.CreateAPIView):
                 status = status.HTTP_201_CREATED
                 )
 
-      
-# migrate master savings
-class MigrateMasterSavings(generics.CreateAPIView):
-    serializer_class = SavingMasterSerializer
-    parser_classes = (MultiPartParser, FormParser,)
-    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
-    
-    def get_queryset(self):
-        # just return the review object
-        return SavingMaster.objects.all()
-    
-    def post(self, request, *args, **kwargs):
-        
-        data = request.FILES['file']
-        reader = pd.read_excel(data)
-        reader = reader.where(pd.notnull(reader), None)
-        dtframe = reader
-        
-        with transaction.atomic():
-              
-            try:
-                
-                for dtframe in dtframe.itertuples():
-                    
-                    SavingMaster.objects.create(
-                        name = dtframe.name,
-                        ippis_number = dtframe.ippis_no,
-                        narration = dtframe.notes,
-                        amount = float(dtframe.saving_cumulative),
-                        transaction_code = int(2222),
-                        active= float(dtframe.status),
-                        transaction_date = dtframe.entry_date,
-                        upload_by = request.user,
-                    )
-                  
-            except Exception as e:
-                raise ValidationError(e)
-           
-        return Response(
-                {'msg':'Master Savings Migrated Successfuly'},
-                status = status.HTTP_201_CREATED
-                )   
-        
-        
 
-# migrate user savings
-class MigrateSavings(generics.CreateAPIView):
-    serializer_class = SavingSerializer
-    parser_classes = (MultiPartParser, FormParser,)
-    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
-    
-    def get_queryset(self):
-        # just return the review object
-        return Saving.objects.all()
-    
-    def post(self, request, *args, **kwargs):
-        
-        data = request.FILES['file']
-        reader = pd.read_excel(data)
-        reader = reader.where(pd.notnull(reader), 0)
-        dtframe = reader
-        
-        with transaction.atomic():
-              
-            try:
-                
-                for dtframe in dtframe.itertuples():
-                    
-                    Saving.objects.create(
-               
-                        transaction_date = dtframe.entry_date,
-                        transaction_code = int(2222),
-                        credit= float(dtframe.amount_saved),
-                        debit = dtframe.amount_withdrawn,
-                        narration = dtframe.notes,
-                        created_by = request.user,
-                        user = User.objects.get(pk = int(dtframe.user_id)),
-                    
-
-                    )
-                  
-            except Exception as e:
-                raise ValidationError(e)
-           
-        return Response(
-                {'msg':'Savings Migrated Successfuly'},
-                status = status.HTTP_201_CREATED
-                )    
-        
-        
-# Migrate MasterLoanDeduction
-class MigrateMasterLoanDeduction(generics.CreateAPIView):
-    serializer_class = MonthlyLoanDeductionSerializer
-    parser_classes = (MultiPartParser, FormParser,)
-    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
-    
-    def get_queryset(self):
-        # just return the review object
-        return MasterLoanDeduction.objects.all()
-    
-    def post(self, request, *args, **kwargs):
-        
-        data = request.FILES['file']
-        reader = pd.read_excel(data)
-        reader['master_reference'] = reader['master_reference'].str.replace(' ', '').str.replace('-', '')
-        reader = reader.where(pd.notnull(reader), None)
-        dtframe = reader
-        
-        with transaction.atomic():
-              
-            try:
-                
-                for dtframe in dtframe.itertuples():
-                    
-                    MasterLoanDeduction.objects.create(
-                        
-                        name = dtframe.name,
-                        ippis_number = dtframe.ippis_no,
-                        entry_date = dtframe.entry_date,
-                        active = dtframe.status,
-                        transaction_code = int(dtframe.master_reference),
-                        cumulative_amount= float(dtframe.cumulative_amount),
-                        narration = dtframe.description,
-                        created_by = request.user,
-                    )
-                  
-            except Exception as e:
-                raise ValidationError(e)
-           
-        return Response(
-                {'msg':'Master Loan Deduction Migrated Successfuly'},
-                status = status.HTTP_201_CREATED
-                ) 
-     
-
-# Migrate Loan deduction
-class MigrateLoanDeduction(generics.CreateAPIView):
+# migrate loan subscriptions without guarantors
+class MigrateLoanDeductionCelery(generics.CreateAPIView):
     serializer_class = DeductionSerializer
     parser_classes = (MultiPartParser, FormParser,)
     permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
@@ -1220,33 +1174,228 @@ class MigrateLoanDeduction(generics.CreateAPIView):
         
         data = request.FILES['file']
         reader = pd.read_excel(data)
-        reader['deduct_reference'] = reader['deduct_reference'].str.replace(' ', '').str.replace('-', '')
-        reader = reader.where(pd.notnull(reader), None)
         dtframe = reader
+        
+        json_data = dtframe.to_json()
+        
         
         with transaction.atomic():
               
             try:
+                # call worker here
+                upload_loan_deduction.delay(json_data)
                 
-                for dtframe in dtframe.itertuples():
-                    
-                    Deduction.objects.create(
-         
-                        loanee = User.objects.get(int(dtframe.user_id)),
-                        loan = Loan.objects.get(int(dtframe.lsubscription_id)),
-                        transaction_date = dtframe.entry_month,
-                        transaction_code = int(dtframe.deduct_reference),
-                        credit= float(dtframe.amount_deducted),
-                        debit= float(dtframe.amount_debited),
-                        narration = dtframe.notes,
-                        created_by = request.user,
-                    )
-                  
             except Exception as e:
                 raise ValidationError(e)
+            except ValueError as e:
+                raise ValueError(f"Invalid value: {e}")
+            except TypeError as e:
+                raise TypeError(f"Type error: {e}")
            
         return Response(
-                {'msg':'Loan Deduction Migrated Successfuly'},
+                {'msg':'Loans Migrated Successfuly'},
+                status = status.HTTP_201_CREATED
+                )     
+
+
+# Migration: Update loan deduction ids
+
+class MigrateUpdateDeductionIdsCelery(generics.GenericAPIView,):
+    serializer_class = DeductionSerializer
+    parser_classes = (MultiPartParser, FormParser,)
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+    def get_queryset(self):
+        # just return the review object
+        return Deduction.objects.all()
+    
+    def post(self, request, *args, **kwargs):
+        try:
+            update_loan_deduction_loanids.delay()
+        except Exception as e:
+            raise ValidationError(e)
+
+        return Response({'msg': 'Updated Successfully'}, status=status.HTTP_201_CREATED)
+
+
+# celery upload user savings
+
+class MigrateUserSavingCelery(generics.CreateAPIView):
+    serializer_class = SavingSerializer
+    parser_classes = (MultiPartParser, FormParser,)
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+    def get_queryset(self):
+        # just return the review object
+        return Saving.objects.all()
+    
+    def post(self, request, *args, **kwargs):
+        
+        data = request.FILES['file']
+        reader = pd.read_excel(data)
+        dtframe = reader
+        
+        json_data = dtframe.to_json()
+        
+        
+        with transaction.atomic():
+              
+            try:
+                # call worker here
+                userid = request.user.id
+                upload_user_savings.delay(userid,json_data)
+                
+            except Exception as e:
+                raise ValidationError(e)
+        
+           
+        return Response(
+                {'msg':'Loans Migrated Successfuly'},
                 status = status.HTTP_201_CREATED
                 ) 
-          
+    
+    
+class MigrateProfileUpdateCelery(generics.CreateAPIView):
+    serializer_class = ProfileSerializer
+    parser_classes = (MultiPartParser, FormParser,)
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+    def get_queryset(self):
+        # just return the review object
+        return Profile.objects.all()
+    
+    def post(self, request, *args, **kwargs):
+        
+        data = request.FILES['file']
+        reader = pd.read_excel(data)
+        dtframe = reader
+        
+        json_data = dtframe.to_json()
+        try:
+            update_profile.delay(json_data)
+        except Exception as e:
+            raise ValidationError(e)
+                    
+        return Response(
+                {'msg':'Profile Migrated Successfuly'},
+                status = status.HTTP_201_CREATED
+                )
+        
+# update NOKS
+class MigrateProfileNokCelery(generics.CreateAPIView):
+    serializer_class = ProfileSerializer
+    parser_classes = (MultiPartParser, FormParser,)
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+    def get_queryset(self):
+        # just return the review object
+        return Profile.objects.all()
+    
+    def post(self, request, *args, **kwargs):
+        
+        data = request.FILES['file']
+        reader = pd.read_excel(data)
+        dtframe = reader
+        
+        json_data = dtframe.to_json()
+        try:
+            update_nok.delay(json_data)
+        except Exception as e:
+            raise ValidationError(e)
+                    
+        return Response(
+                {'msg':'Nok Migrated Successfuly'},
+                status = status.HTTP_201_CREATED
+                )
+
+
+# upate Banks
+class MigrateProfileBanksCelery(generics.CreateAPIView):
+    serializer_class = ProfileSerializer
+    parser_classes = (MultiPartParser, FormParser,)
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+    def get_queryset(self):
+        # just return the review object
+        return Profile.objects.all()
+    
+    def post(self, request, *args, **kwargs):
+        
+        data = request.FILES['file']
+        reader = pd.read_excel(data)
+        dtframe = reader
+        
+        json_data = dtframe.to_json()
+        try:
+            update_bank.delay(json_data)
+        except Exception as e:
+            raise ValidationError(e)
+                    
+        return Response(
+                {'msg':'Banks Migrated Successfuly'},
+                status = status.HTTP_201_CREATED
+                )
+        
+#  migrate master loan deductions
+class MigrateMasterLoanDeductionCelery(generics.CreateAPIView):
+    serializer_class = MonthlyLoanDeductionSerializer
+    parser_classes = (MultiPartParser, FormParser,)
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+    def get_queryset(self):
+        # just return the review object
+        return MasterLoanDeduction.objects.all()
+    
+    def post(self, request, *args, **kwargs):
+        
+        data = request.FILES['file']
+        reader = pd.read_excel(data)
+        dtframe = reader
+        
+        json_data = dtframe.to_json()
+        try:
+            userid = request.user.id
+            upload_master_loan_deduction.delay(userid,json_data)
+        except Exception as e:
+            raise ValidationError(e)
+                    
+        return Response(
+                {'msg':'Master Loan Deductions Migrated Successfuly'},
+                status = status.HTTP_201_CREATED
+                ) 
+      
+        
+#  migrate master saving deductions
+class MigrateMasterSavingDeductionCelery(generics.CreateAPIView):
+    serializer_class = SavingMasterSerializer
+    parser_classes = (MultiPartParser, FormParser,)
+    permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+    def get_queryset(self):
+        # just return the review object
+        return MasterLoanDeduction.objects.all()
+    
+    def post(self, request, *args, **kwargs):
+        
+        data = request.FILES['file']
+        reader = pd.read_excel(data)
+        dtframe = reader
+        
+        json_data = dtframe.to_json()
+        try:
+            userid = request.user.id
+            upload_master_saving.delay(userid,json_data)
+        except Exception as e:
+            raise ValidationError(e)
+                    
+        return Response(
+                {'msg':'Master Deductions Migrated Successfuly'},
+                status = status.HTTP_201_CREATED
+                ) 
+
+
+
+ 
+        
+        
+

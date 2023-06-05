@@ -2,7 +2,8 @@ from __future__ import absolute_import,unicode_literals
 import os
 
 from celery import Celery
-# from core.tasks import create_loan_subscription
+from django.conf import settings
+
 
 
 # Set the default Django settings module for the 'celery' program.
@@ -16,14 +17,15 @@ app = Celery('midas')
 #   should have a `CELERY_` prefix.
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
-#we are using asia/kolkata time so we are making it False
-app.conf.timezone = 'Africa/Lagos'  # Set the Celery timezone to Lagos, Nigeria timezone
-app.conf.enable_utc = False  # Disable UTC timezone conversion
-
 # Load task modules from all registered Django apps.
-app.autodiscover_tasks()
+app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
+# app.autodiscover_tasks()
 
 
 @app.task(bind=True)
 def debug_task(self):
     print(f'Request: {self.request!r}')
+    
+@app.task()
+def luper(self,x, y):
+    print( x * y)

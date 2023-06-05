@@ -3,6 +3,7 @@ from rest_framework import serializers
 # import models
 from core.models import *
 from django.db.models import Q, Sum, Avg, Max, Min, Count
+from django.db.models import F
 
 User = get_user_model()
 
@@ -17,18 +18,29 @@ class DeductionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Deduction
         fields = "__all__"
+        # ordering=['-transaction_date']
         
     def get_loan_id(self,object):
         return object.loan.pk
         
     def get_loan_balance(self,object):
+        # previous_balances = Deduction.objects.filter(transaction_date__lt=object.transaction_date)
+        
+        # previous_balances = Deduction.objects.filter(Q(transaction_date__lt=object.transaction_date) & Q(loan=object.loan.pk))
+        
+        # total_debits = previous_balances.aggregate(total_debits=Sum('debit'))['total_debits'] or 0
+        # total_credits = previous_balances.aggregate(total_credits=Sum('credit'))['total_credits'] or 0
+        # trnxDiff = total_credits - total_debits
+        # return object.loan.approved_amount-trnxDiff
+       
         
         
-        allDeductions = Deduction.objects.filter(Q(transaction_date = object.transaction_date) & Q(loan=object.loan.pk))
+       
+        allDeductions = Deduction.objects.filter(Q(transaction_date=object.transaction_date) & Q(loan=object.loan.pk))
         
         if (allDeductions.count() > 1):
             # select records greater than this date
-            GreaterDeductions = Deduction.objects.filter(Q(transaction_date__gt=object.transaction_date) & Q(loan=object.loan.pk))
+            GreaterDeductions = Deduction.objects.filter(Q(transaction_date__lt=object.transaction_date) & Q(loan=object.loan.pk))
             
             totalcredit = GreaterDeductions.aggregate(credit=Sum('credit'))
                             
@@ -43,7 +55,6 @@ class DeductionSerializer(serializers.ModelSerializer):
             
             Deductions = Deduction.objects.filter(Q(transaction_date=object.transaction_date) & Q(loan=object.loan.pk) & Q(pk__lte=object.pk))
     
-        
             totalcredit = Deductions.aggregate(credit=Sum('credit'))
                             
             totaldebit = Deductions.aggregate(debit=Sum('debit'))
@@ -60,7 +71,7 @@ class DeductionSerializer(serializers.ModelSerializer):
             return object.loan.approved_amount-payments
             
         
-        all_Deductions = Deduction.objects.filter(Q(transaction_date__gte= object.transaction_date) & Q(loan=object.loan.pk))
+        all_Deductions = Deduction.objects.filter(Q(transaction_date__lte= object.transaction_date) & Q(loan=object.loan.pk))
         
         totalcredit = all_Deductions.aggregate(credit=Sum('credit'))
                             
@@ -162,6 +173,101 @@ class LoanSerializer(serializers.ModelSerializer):
     totalCredit =serializers.SerializerMethodField()
     totalDebit =serializers.SerializerMethodField()
   
+    # deductions = DeductionSerializer(many=True,read_only=True)
+    
+    class Meta:
+        model = Loan
+        fields = "__all__"
+
+    def get_total_balance(self,object):
+        
+        allDeductions = Deduction.objects.filter(loan=object.pk)
+        
+        totalcredit = allDeductions.aggregate(credit=Sum('credit'))
+                        
+        totaldebit = allDeductions.aggregate(debit=Sum('debit'))
+        credit = totalcredit['credit']
+        debit = totaldebit['debit']
+       
+        if not credit:
+            credit=0
+        if not debit:
+            debit=0            
+                        
+        payments = credit - debit
+        
+        return object.approved_amount - payments
+    
+    
+    def get_totaldeduction(self,object):
+        
+        allDeductions = Deduction.objects.filter(loan=object.pk)
+        
+        totalcredit = allDeductions.aggregate(credit=Sum('credit'))
+                        
+        totaldebit = allDeductions.aggregate(debit=Sum('debit'))
+        credit = totalcredit['credit']
+        debit = totaldebit['debit']
+       
+        if not credit:
+            credit=0
+        if not debit:
+            debit=0            
+                        
+        return  credit - debit
+        
+        # return object.approved_amount - payments
+    
+    def get_loan_owner(self,object):
+        
+        Owner = User.objects.get(pk=object.owner.pk)
+        firstname = Owner.first_name
+        first_name = firstname.lower()
+        return Owner.last_name.upper() + ' ' + first_name
+    
+    def get_loan_owner_id(self,object):
+            
+        Owner = User.objects.get(pk=object.owner.pk)
+        return Owner.pk
+    
+    def get_product_name(self,object):
+            
+        product = Product.objects.get(pk=object.product.pk)
+        return product.name
+    
+    def get_totalCredit(self,obj):
+            
+        credit = Deduction.objects.filter(loan=obj.pk).aggregate(credit=Sum('credit'))
+        credit = credit['credit']
+        if not credit:
+            credit=0
+            
+        return credit
+    
+    def get_totalDebit(self,obj):
+            
+        debit = Deduction.objects.filter(loan=obj.pk).aggregate(debit=Sum('debit'))
+        
+        debit = debit['debit']
+        if not debit:
+            debit=0
+            
+        return debit
+
+
+# Loan Detail Serializer
+class LoanDetailSerializer(serializers.ModelSerializer):
+    
+    owner = serializers.StringRelatedField()
+    created_by = serializers.StringRelatedField()
+    
+    total_balance = serializers.SerializerMethodField()
+    totaldeduction = serializers.SerializerMethodField()
+    loan_owner = serializers.SerializerMethodField()
+    product_name = serializers.SerializerMethodField()
+    loan_owner_id = serializers.SerializerMethodField()
+    totalCredit =serializers.SerializerMethodField()
+    totalDebit =serializers.SerializerMethodField()
     deductions = DeductionSerializer(many=True,read_only=True)
     
     class Meta:
@@ -241,7 +347,6 @@ class LoanSerializer(serializers.ModelSerializer):
             
         return debit
     
-    
 # class ProductSerializer(serializers.ModelSerializer):
 #     loans = LoanSerializer(many=True, read_only=True)
 #     product_scheme = serializers.StringRelatedField(read_only=True)
@@ -252,7 +357,7 @@ class LoanSerializer(serializers.ModelSerializer):
 #         fields= '__all__'
         
 class ProductSerializer(serializers.ModelSerializer):
-    loans = LoanSerializer(many=True, read_only=True)
+    # loans = LoanSerializer(many=True, read_only=True)
     # product_scheme = serializers.StringRelatedField(read_only=True)
     scheme = serializers.SerializerMethodField()
 
@@ -531,11 +636,11 @@ class SavingSerializer(serializers.ModelSerializer):
     def get_balance(self,object):
         
         
-        allDeductions = Saving.objects.filter(Q(transaction_date = object.transaction_date) & Q(user=object.user.pk))
+        allDeposit = Saving.objects.filter(Q(transaction_date = object.transaction_date) & Q(user=object.user.pk))
         
-        if (allDeductions.count() > 1):
+        if (allDeposit.count() > 1):
             # select records greater than this date
-            GreaterDeductions = Saving.objects.filter(Q(transaction_date__gt=object.transaction_date) & Q(user=object.user.pk))
+            GreaterDeductions = Saving.objects.filter(Q(transaction_date__lt=object.transaction_date) & Q(user=object.user.pk))
             
             totalcredit = GreaterDeductions.aggregate(credit=Sum('credit'))
                             
@@ -567,7 +672,7 @@ class SavingSerializer(serializers.ModelSerializer):
             return payments
             
         
-        all_Deductions = Saving.objects.filter(Q(transaction_date__gte= object.transaction_date) & Q(user=object.user.pk))
+        all_Deductions = Saving.objects.filter(Q(transaction_date__lte= object.transaction_date) & Q(user=object.user.pk))
         
         totalcredit = all_Deductions.aggregate(credit=Sum('credit'))
                             

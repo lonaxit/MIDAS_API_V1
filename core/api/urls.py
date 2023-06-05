@@ -84,6 +84,12 @@ urlpatterns =[
      # User Opening Balance 
     path('<int:pk>/<str:startdate>/deposit-opening/balance/',UserOpeningBalance.as_view(),name="deposit=opening-balance"),
     
+    # loans guaranteed
+   
+    path('loans/guarantor/<int:guarantor_id>/',ListGuaranteeLoans.as_view(), name='loans-by-guarantor'),
+    
+ 
+    
     
     
     # db migration
@@ -96,12 +102,18 @@ urlpatterns =[
     path('loans-migration/', MigrateLoanSub.as_view(),name='migrate-loans'),
      
     path('migrate-loans-celery/', loanMigrationCelery.as_view(),name='migrate-loans-celery'),
+    path('loan_deduction-celery/', MigrateLoanDeductionCelery.as_view(),name='loan_deduction-celery'),
+    path('update_deductionids/', MigrateUpdateDeductionIdsCelery.as_view(),name='update_deductionids'),
+    path('upload_usersavings/', MigrateUserSavingCelery.as_view(),name='upload_usersavings'),
+    path('update_profile/', MigrateProfileUpdateCelery.as_view(),name='update_profile'),
     
-    # path('loans-without-guarantors/', MigrateLoanSubNoGuarantors.as_view(),name='migrate-loans'),
+    path('update_nok/', MigrateProfileNokCelery.as_view(),name='update_nok'),
+    path('update_bank/', MigrateProfileBanksCelery.as_view(),name='update_bank'),
+    path('upload_master_loan_deduction/', MigrateMasterLoanDeductionCelery.as_view(),name='upload_master_loan_deduction'),
     
-    path('migrate-mastersaving/', MigrateMasterSavings.as_view(),name='migrate-mastersaving'),
+    path('upload_master_saving_deduction/', MigrateMasterSavingDeductionCelery.as_view(),name='upload_master_saving_deduction'),
+
     
-    path('migrate-savings/', MigrateSavings.as_view(),name='migrate-savings'),
-    path('migrate-MasterLoanDeduction/', MigrateMasterLoanDeduction.as_view())
+   
 
 ]
