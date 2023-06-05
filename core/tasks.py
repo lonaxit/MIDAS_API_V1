@@ -8,6 +8,7 @@ import math
 import io, csv, pandas as pd
 import json
 import datetime
+from core.api.utilities import *
 User = get_user_model()
 
 @shared_task(bind=True)
@@ -368,3 +369,121 @@ def upload_master_saving(userid,data):
             raise ValueError(f"Invalid value: {e}")
         except TypeError as e:
             raise TypeError(f"Type error: {e}")
+        
+        
+
+# Create bulk deduction from a master deduction table
+def create_bulk_loan_deduction(userid,data):
+    
+      # convert the JSON data to a DataFrame
+    data_frame = pd.read_json(data)
+    
+    
+    # get all active master deduction records
+    masterDeductions= MasterLoanDeduction.objects.filter(active=True)
+        
+    # get all active loans
+    activeLoans = Loan.objects.filter(active=True)
+        
+    allDeductions = Deduction.objects.filter(loan__active=True)
+        
+    if masterDeductions.exists():
+        
+           
+        for master in masterDeductions:
+            
+            try:
+                # total cumulative deduction
+                ippis_Deduction = master.cumulative_amount
+                    
+                profile = Profile.objects.get(ippis=master.ippis_number)
+                    
+                # get all active loans for a user
+                myLoans = activeLoans.filter(owner=profile.user)
+                    
+                # total Monthly Deduction
+                total_MonthlyDedcution = activeLoans.aggregate(totalMonthlyDeduction=Sum('monthly_deduction'))
+                    
+                monthlyDeduction = total_MonthlyDedcution['totalMonthlyDeduction']
+                    
+                    
+                if ippis_Deduction > monthlyDeduction:
+                    
+                    continue
+                    
+                    
+                userDeductions = allDeductions.filter(loanee=profile.user)
+                    
+                
+                for singleLoan in myLoans:
+                    
+                    # get principal loan amount
+                    loanPrincipal  = singleLoan.approved_amount
+                           
+                    totalcredit = userDeductions.filter(loan=singleLoan).aggregate(credit=Sum('credit'))
+                        
+                    totaldebit = userDeductions.filter(loan=singleLoan).aggregate(debit=Sum('debit'))
+                        
+                    credits = totalcredit['credit']
+                    debits = totaldebit['debit']
+                        
+                    if not credits:
+                        credits =0
+                    if not debits:
+                        debits =0
+                            
+                    payments = credits-debits
+                        
+                    # balance
+                    bal = loanPrincipal-payments
+                        
+                    if(bal and bal <= singleLoan.monthly_deduction):
+                        
+                        ippis_Deduction = ippis_Deduction-bal
+                            
+                        Deduction.objects.create(  
+                                    loanee=profile.user,
+                                    loan= singleLoan,
+                                    credit = bal,
+                                    narration = master.narration,
+                                    transaction_date = master.entry_date,
+                                    transaction_code = master.transaction_code,
+                                    created_by=User.objects.get(pk=userid),
+                                    )
+                        deactivateLoan(singleLoan)
+                            
+                           
+                            
+                    elif(bal and bal > ippis_Deduction):
+                        ippis_Deduction = ippis_Deduction-singleLoan.monthly_deduction
+                          
+                        Deduction.objects.create(  
+                                    loanee=profile.user,
+                                    loan= singleLoan,
+                                    credit = singleLoan.monthly_deduction,
+                                    narration = master.narration,
+                                    transaction_date = master.entry_date,
+                                    transaction_code = master.transaction_code,
+                                    created_by=User.objects.get(pk=userid),
+                                    )
+                        deactivateLoan(singleLoan)
+                         
+                    elif(ippis_Deduction > bal):
+                           continue
+                        
+                        
+                    # update the master record to inactive
+                    master.active = False
+                    master.save()
+                            
+                # except Profile.DoesNotExist:
+                #     continue
+            except Profile.DoesNotExist:
+                continue
+                
+            return Response(
+                {'msg':'Loan deductions created successfully'},
+                status = status.HTTP_201_CREATED
+                )
+        else:
+            raise ValidationError('No unprocessed deductions yet!')
