@@ -694,6 +694,13 @@ class CreateBulkSaving(generics.CreateAPIView):
            
             for master in masterSaving:
                 
+                
+                user_ = User.objects.filter(ippis_number=master.ippis_number)
+                countUser = user_.count()
+                if countUser > 1:
+                    continue
+                
+                
                 try:
                     
                     user = User.objects.get(ippis_number=master.ippis_number)
