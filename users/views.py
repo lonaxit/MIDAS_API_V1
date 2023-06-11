@@ -57,8 +57,7 @@ class RegistrationView(APIView):
                     
                     if not User.objects.filter(username=username).exists():
                         
-                        
-                        #  User.objects.create_user(first_name=first_name,last_name=last_name,username=username,password=password,ippis_number=ippis_number,dob=dob,dofa=dofa)
+                        # User.objects.create_user(first_name=first_name,last_name=last_name,username=username,password=password,ippis_number=ippis_number,dob=dob,dofa=dofa)
                             
                         #  return Response(
                         #     {'msg':'User created successfuly'},
