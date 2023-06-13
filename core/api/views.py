@@ -104,42 +104,96 @@ class LoanUpload(generics.CreateAPIView):
         
         data = request.FILES['file']
         reader = pd.read_excel(data)
+        reader = reader.where(pd.notnull(reader), None)
         dtframe = reader
         
         with transaction.atomic():
-            # TODO
-            # 1 CREATE EACH LOAN IN THE LOAN MODEL
-            # 2. CREATE CORRESPONDING LOAN IN THE CONSOLIDATED LOANS TABLE AS DEBIT
-            
             # generate random number 
             random_number = ''.join((random.choice(string.digits) for x in range(10)))
-            
+              
             try:
                 
                 for dtframe in dtframe.itertuples():
+                    guarantor_id1 = 0
+                    guarantor_id2 = 0
                     
+                    if not math.isnan(dtframe.GUARANTORONE):
+                        guarantor_id1 = dtframe.GUARANTORONE
+                    elif not math.isnan(dtframe.GUARANTORTWO):
+                        guarantor_id2 = dtframe.GUARANTORTWO
                     
-                    loanObj = Loan.objects.create(
-                                    owner=User.objects.get(pk=dtframe.owner),
-                                    product=Product.objects.get(pk=dtframe.product),
-                                    transaction_code = random_number,
-                                    applied_amount=int(dtframe.applied_amount),
-                                    loan_date = dtframe.loan_date,
-                                    start_date=dtframe.start_date,
-                                    end_date = dtframe.end_date,
-                                    approved_amount=int(dtframe.approved_amount),
-                                    monthly_deduction=int(dtframe.monthly_deduction),
-                                    net_pay=int(dtframe.net_pay),
-                                    tenor=int(dtframe.tenor),
-                                    created_by=User.objects.get(pk=dtframe.created_by),
-                                    )
+                    Loan.objects.create(
+                        loan_date = dtframe.DISBURSEMENT,
+                        start_date = dtframe.START,
+                        end_date = dtframe.END,
+                        transaction_code = random_number, 
+                        approved_amount = float(dtframe.AMOUNT),
+                        monthly_deduction = float(dtframe.DEDUCTION),
+                        tenor = int(dtframe.TENOR),
+                        created_by = request.user,
+                        product= Product.objects.get(pk=int(dtframe.PRODUCTID)),
+                        owner = User.objects.get(pk = int(dtframe.REGNO)),
+                        guarantor_one= guarantor_id1,
+                        guarantor_two = guarantor_id2,
+                    )
+                  
             except Exception as e:
                 raise ValidationError(e)
            
         return Response(
-                {'msg':'Loan(s) created successfuly'},
+                {'msg':'Loans updated successfully'},
                 status = status.HTTP_201_CREATED
                 )
+    
+    # ********************
+    # serializer_class = LoanSerializer
+    # parser_classes = (MultiPartParser, FormParser,)
+    # permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+    # def get_queryset(self):
+    #     # just return the review object
+    #     return Loan.objects.all()
+    
+    # def post(self, request, *args, **kwargs):
+        
+    #     data = request.FILES['file']
+    #     reader = pd.read_excel(data)
+    #     dtframe = reader
+        
+    #     with transaction.atomic():
+    #         # TODO
+    #         # 1 CREATE EACH LOAN IN THE LOAN MODEL
+    #         # 2. CREATE CORRESPONDING LOAN IN THE CONSOLIDATED LOANS TABLE AS DEBIT
+            
+    #         # generate random number 
+    #         random_number = ''.join((random.choice(string.digits) for x in range(10)))
+            
+    #         try:
+                
+    #             for dtframe in dtframe.itertuples():
+                    
+                    
+    #                 loanObj = Loan.objects.create(
+    #                                 owner=User.objects.get(pk=dtframe.owner),
+    #                                 product=Product.objects.get(pk=dtframe.product),
+    #                                 transaction_code = random_number,
+    #                                 applied_amount=int(dtframe.applied_amount),
+    #                                 loan_date = dtframe.loan_date,
+    #                                 start_date=dtframe.start_date,
+    #                                 end_date = dtframe.end_date,
+    #                                 approved_amount=int(dtframe.approved_amount),
+    #                                 monthly_deduction=int(dtframe.monthly_deduction),
+    #                                 net_pay=int(dtframe.net_pay),
+    #                                 tenor=int(dtframe.tenor),
+    #                                 created_by=User.objects.get(pk=dtframe.created_by),
+    #                                 )
+    #         except Exception as e:
+    #             raise ValidationError(e)
+           
+    #     return Response(
+    #             {'msg':'Loan(s) created successfuly'},
+    #             status = status.HTTP_201_CREATED
+    #             )
 
 # List all loans in the system
 class LoanListCreate(generics.ListCreateAPIView):
