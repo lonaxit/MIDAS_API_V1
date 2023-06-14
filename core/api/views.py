@@ -461,9 +461,12 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
         masterDeductions= MasterLoanDeduction.objects.filter(active=True)
         
         # get all active loans
-       
-        activeLoans = Loan.objects.filter(active=True)
-        
+        activeLoans = Loan.objects.filter(active=True).order_by('tenor')
+        # activeLoans = Loan.objects.filter(active=True)
+        # user_id = 123  # Replace with the actual user ID
+
+        # sallDeductions = Deduction.objects.filter(loan__active=True, loan__owner=user_id)
+
         allDeductions = Deduction.objects.filter(loan__active=True)
         
         if masterDeductions.exists():
@@ -471,83 +474,189 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
             for master in masterDeductions:
                 
                 try:
-                    # total cumulative deduction
+                    # total cumulative deduction for a particular ippis number
                     ippis_Deduction = master.cumulative_amount
                     
+                    # get the user profile based on that IPPIS Number
                     profile = Profile.objects.get(ippis=master.ippis_number)
                     
                     # get all active loans for a user
                     myLoans = activeLoans.filter(owner=profile.user)
                     
-                    # total Monthly Deduction
-                    total_MonthlyDedcution = activeLoans.aggregate(totalMonthlyDeduction=Sum('monthly_deduction'))
+                    #total Monthly Deduction for all user loans
+                    total_MonthlyDedcution = myLoans.aggregate(totalMonthlyDeduction=Sum('monthly_deduction'))
                     
-                    monthlyDeduction = total_MonthlyDedcution['totalMonthlyDeduction']
+                    userTotalMonthlyDeduction = total_MonthlyDedcution['totalMonthlyDeduction']
                     
-                    
-                    if ippis_Deduction > monthlyDeduction:
-                        continue
-                    
-                    
-                    userDeductions = allDeductions.filter(loanee=profile.user)
-                    
-                
-                    for singleLoan in myLoans:
-               
-                        # get principal loan amount
-                        loanPrincipal  = singleLoan.approved_amount
-                           
-                        totalcredit = userDeductions.filter(loan=singleLoan).aggregate(credit=Sum('credit'))
-                        
-                        totaldebit = userDeductions.filter(loan=singleLoan).aggregate(debit=Sum('debit'))
-                        
-                        credits = totalcredit['credit']
-                        debits = totaldebit['debit']
-                        
-                        if not credits:
-                            credits =0
-                        if not debits:
-                            debits =0
-                            
-                        payments = credits-debits
-                        
-                        # balance
-                        bal = loanPrincipal-payments
-                        
-                        if(bal and bal <= singleLoan.monthly_deduction):
-                            ippis_Deduction = ippis_Deduction-bal
-                            
-                            Deduction.objects.create(  
+                    # greater than
+                    if ippis_Deduction > userTotalMonthlyDeduction:
+                        # distribute the loans equally but pay the remaining balance on the last loan
+                        for index, loanItem in enumerate(myLoans):
+                            # check for las loan
+                            if index == len(myLoans) - 1:
+                                # pay what ever that is remaining on the last loan
+                                
+                                Deduction.objects.create(  
                                     loanee=profile.user,
-                                    loan= singleLoan,
+                                    loan= loanItem,
+                                    credit = ippis_Deduction,
+                                    narration = master.narration,
+                                    transaction_date = master.entry_date,
+                                    transaction_code = master.transaction_code,
+                                    created_by=request.user,
+                                    )
+                                deactivateLoan(loanItem)
+                    
+                            userDeductions = allDeductions.filter(loanee=profile.user)
+                            
+                            # get principal loan amount
+                            loanPrincipal  = loanItem.approved_amount
+                            totalcredit = userDeductions.filter(loan=loanItem).aggregate(credit=Sum('credit'))
+                        
+                            totaldebit = userDeductions.filter(loan=loanItem).aggregate(debit=Sum('debit'))
+                            
+                            credits = totalcredit['credit']
+                            debits = totaldebit['debit']
+                        
+                            if not credits:
+                                credits =0
+                            if not debits:
+                                debits =0
+                            
+                            payments = credits-debits
+                            
+                            # balance
+                            bal = loanPrincipal-payments
+                            
+                            # if bal == 0:
+                            #     continue
+
+                            if(bal <= loanItem.monthly_deduction):
+                                ippis_Deduction = ippis_Deduction-bal
+                                Deduction.objects.create(  
+                                    loanee=profile.user,
+                                    loan= loanItem,
                                     credit = bal,
                                     narration = master.narration,
                                     transaction_date = master.entry_date,
                                     transaction_code = master.transaction_code,
                                     created_by=request.user,
                                     )
-                            deactivateLoan(singleLoan)
-                            
-                           
-                            
-                        elif(bal and bal > ippis_Deduction):
-                            ippis_Deduction = ippis_Deduction-singleLoan.monthly_deduction
-                          
-                            Deduction.objects.create(  
+                                deactivateLoan(loanItem)
+                                
+                            elif(bal > loanItem.monthly_deduction):
+                                ippis_Deduction = ippis_Deduction-loanItem.monthly_deduction
+                                Deduction.objects.create(  
                                     loanee=profile.user,
-                                    loan= singleLoan,
-                                    credit = singleLoan.monthly_deduction,
+                                    loan= loanItem,
+                                    credit = loanItem.monthly_deduction,
                                     narration = master.narration,
                                     transaction_date = master.entry_date,
                                     transaction_code = master.transaction_code,
                                     created_by=request.user,
                                     )
-                            deactivateLoan(singleLoan)
-                         
-                        elif(ippis_Deduction > bal):
-                           continue
+                                deactivateLoan(loanItem)
+                               
+                                
+                    elif ippis_Deduction == userTotalMonthlyDeduction:
                         
+                        for index, loanItem in enumerate(myLoans):
+                            # check for las loan
+                            if index == len(myLoans) - 1:
+                                # pay what ever that is remaining on the last loan
+                                
+                                Deduction.objects.create(  
+                                    loanee=profile.user,
+                                    loan= loanItem,
+                                    credit = ippis_Deduction,
+                                    narration = master.narration,
+                                    transaction_date = master.entry_date,
+                                    transaction_code = master.transaction_code,
+                                    created_by=request.user,
+                                    )
+                                deactivateLoan(loanItem)
+                            
+                            ippis_Deduction = ippis_Deduction-loanItem.monthly_deduction
+                            Deduction.objects.create(  
+                                    loanee=profile.user,
+                                    loan= loanItem,
+                                    credit = loanItem.monthly_deduction,
+                                    narration = master.narration,
+                                    transaction_date = master.entry_date,
+                                    transaction_code = master.transaction_code,
+                                    created_by=request.user,
+                                    )
+                            deactivateLoan(loanItem)
+                            
+                    elif ippis_Deduction < userTotalMonthlyDeduction:
+                        # distribute the loans equally but pay the remaining balance on the last loan
+                        for index, loanItem in enumerate(myLoans):
+                            # check for las loan
+                            if index == len(myLoans) - 1:
+                                # pay what ever that is remaining on the last loan
+                                
+                                Deduction.objects.create(  
+                                    loanee=profile.user,
+                                    loan= loanItem,
+                                    credit = ippis_Deduction,
+                                    narration = master.narration,
+                                    transaction_date = master.entry_date,
+                                    transaction_code = master.transaction_code,
+                                    created_by=request.user,
+                                    )
+                                deactivateLoan(loanItem)
+                    
+                            userDeductions = allDeductions.filter(loanee=profile.user)
+                            
+                            # get principal loan amount
+                            loanPrincipal  = loanItem.approved_amount
+                            totalcredit = userDeductions.filter(loan=loanItem).aggregate(credit=Sum('credit'))
                         
+                            totaldebit = userDeductions.filter(loan=loanItem).aggregate(debit=Sum('debit'))
+                            
+                            credits = totalcredit['credit']
+                            debits = totaldebit['debit']
+                        
+                            if not credits:
+                                credits =0
+                            if not debits:
+                                debits =0
+                            
+                            payments = credits-debits
+                            
+                            # balance
+                            bal = loanPrincipal-payments
+                            
+                            # if bal == 0:
+                            #     continue
+
+                            if(bal <= loanItem.monthly_deduction):
+                                ippis_Deduction = ippis_Deduction-bal
+                                Deduction.objects.create(  
+                                    loanee=profile.user,
+                                    loan= loanItem,
+                                    credit = bal,
+                                    narration = master.narration,
+                                    transaction_date = master.entry_date,
+                                    transaction_code = master.transaction_code,
+                                    created_by=request.user,
+                                    )
+                                deactivateLoan(loanItem)
+                                
+                            elif(bal > loanItem.monthly_deduction):
+                                ippis_Deduction = ippis_Deduction-loanItem.monthly_deduction
+                                Deduction.objects.create(  
+                                    loanee=profile.user,
+                                    loan= loanItem,
+                                    credit = loanItem.monthly_deduction,
+                                    narration = master.narration,
+                                    transaction_date = master.entry_date,
+                                    transaction_code = master.transaction_code,
+                                    created_by=request.user,
+                                    )
+                                deactivateLoan(loanItem)
+                        
+                                
                     # update the master record to inactive
                     master.active = False
                     master.save()
