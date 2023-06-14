@@ -507,8 +507,6 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                                     )
                                 deactivateLoan(loanItem)
                             else:
-                                print(loanItem.approved_amount)
-                           
                                 # userDeductions = allDeductions.filter(loanee=profile)
                                 loanDeductions = Deduction.objects.filter(loan=loanItem)
                             
@@ -519,7 +517,6 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                                 
                                 payments = total_credit - total_debit
                                 bal = loanPrincipal-payments
-                                print(bal)
                                 
                                 if bal <=loanItem.monthly_deduction:
                                     
