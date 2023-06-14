@@ -378,9 +378,9 @@ class MonthlyLoanDeductionUpload(generics.CreateAPIView):
                     
                     loanObj = MasterLoanDeduction.objects.create(  
                                         name= dtframe.NAME,
-                                        ippis_number = dtframe.IPPIS_NUMBER,
-                                        narration = dtframe.NARRATION,
-                                        entry_date = dtframe.DATE,
+                                        ippis_number = dtframe.REGNO,
+                                        narration = dtframe.DESCRIPTION,
+                                        entry_date = dtframe.ENTRYDATE,
                                         transaction_code = random_number,
                                         cumulative_amount = dtframe.AMOUNT,
                                         created_by=request.user,
