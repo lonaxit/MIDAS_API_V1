@@ -478,10 +478,10 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                     ippis_Deduction = master.cumulative_amount
                     
                     # get the user profile based on that IPPIS Number
-                    profile = Profile.objects.get(ippis=master.ippis_number)
+                    profile = User.objects.get(id=master.ippis_number)
                     
                     # get all active loans for a user
-                    myLoans = activeLoans.filter(owner=profile.user)
+                    myLoans = activeLoans.filter(owner=profile)
                     
                     #total Monthly Deduction for all user loans
                     total_MonthlyDedcution = myLoans.aggregate(totalMonthlyDeduction=Sum('monthly_deduction'))
