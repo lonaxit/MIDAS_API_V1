@@ -466,7 +466,7 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
 
         # sallDeductions = Deduction.objects.filter(loan__active=True, loan__owner=user_id)
 
-        allDeductions = Deduction.objects.filter(loan__active=True)
+        # allDeductions = Deduction.objects.filter(loan__active=True)
         
         if masterDeductions.exists():
            
@@ -512,16 +512,22 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                                 
                     
                                 # userDeductions = allDeductions.filter(loanee=profile)
+                                loanDeductions = Deduction.objects.filter(loan=loanItem)
                             
                                 # # get principal loan amount
-                                # loanPrincipal  = loanItem.approved_amount
+                                loanPrincipal  = loanItem.approved_amount
+                                total_credit = loanDeductions.aggregate(credit=Sum('credit'))['credit'] or 0
+                                total_debit = loanDeductions.aggregate(debit=Sum('debit'))['debit'] or 0
+                                
+                                payments = total_credit - total_debit
+                                bal = loanPrincipal-payments
+                                print(bal)
+                                
                                 # totalcredit = userDeductions.filter(loan=loanItem).aggregate(credit=Sum('credit'))
-                        
-                                # totaldebit = userDeductions.filter(loan=loanItem).aggregate(debit=Sum('debit'))
-                            
+                                # totalcredit = loanDeductions.aggregate(credit=Sum('credit'))
+                                # totaldebit = loanDeductions.aggregate(debit=Sum('debit'))
                                 # credits = totalcredit['credit']
                                 # debits = totaldebit['debit']
-                        
                                 # if not credits:
                                 #     credits =0
                                 # if not debits:
