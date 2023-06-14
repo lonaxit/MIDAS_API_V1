@@ -496,7 +496,7 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                             if index == len(myLoans) - 1:
                                 
                                 # pay what ever that is remaining on the last loan
-                                print(loanItem.monthly_deduction)
+                                print(loanItem.approved_amount)
                                 # Deduction.objects.create(  
                                 #     loanee=profile,
                                 #     loan= loanItem,
