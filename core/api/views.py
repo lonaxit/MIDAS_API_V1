@@ -374,7 +374,7 @@ class MonthlyLoanDeductionUpload(generics.CreateAPIView):
             
                 for dtframe in dtframe.itertuples():
                     
-                    transaction_date = dtframe.DATE
+                    # transaction_date = dtframe.DATE
                     
                     loanObj = MasterLoanDeduction.objects.create(  
                                         name= dtframe.NAME,
@@ -398,7 +398,7 @@ class MonthlyLoanDeductionUpload(generics.CreateAPIView):
             except Exception as e:
                 # raise ValidationError('A bad operation happened!')
                 return Response(
-                {'msg':'Soemthing unexpected happened'},
+                {'msg':'Something unexpected happened'},
                 status = status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
             
