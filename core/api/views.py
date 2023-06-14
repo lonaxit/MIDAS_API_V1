@@ -416,7 +416,7 @@ class MasterDeductionDetail(generics.RetrieveUpdateDestroyAPIView):
     
 # list all Master Deduction
 class ListMasterDeduction(generics.ListAPIView):
-    queryset = MasterLoanDeduction.objects.all().order_by('entry_date')
+    queryset = MasterLoanDeduction.objects.filter(active=True).order_by('entry_date')
     serializer_class = MonthlyLoanDeductionSerializer
     permission_classes=[IsAuthenticated & IsAuthOrReadOnly]
 
