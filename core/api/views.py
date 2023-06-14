@@ -518,10 +518,15 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                                 payments = total_credit - total_debit
                                 bal = loanPrincipal-payments
                                 
-                                if bal <=loanItem.monthly_deduction:
+                                if bal <= loanItem.monthly_deduction:
                                     
                                     ippis_Deduction = ippis_Deduction-bal
                                     print(ippis_Deduction)
+                                elif bal > loanItem.monthly_deduction:
+                                    ippis_Deduction = ippis_Deduction-loanItem.monthly_deduction
+                                    print(ippis_Deduction)
+                                    
+                                    
                                 
                                 # totalcredit = userDeductions.filter(loan=loanItem).aggregate(credit=Sum('credit'))
                                 # totalcredit = loanDeductions.aggregate(credit=Sum('credit'))
