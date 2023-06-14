@@ -497,7 +497,7 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                                 # pay what ever that is remaining on the last loan
                                 
                                 Deduction.objects.create(  
-                                    loanee=profile.user,
+                                    loanee=profile,
                                     loan= loanItem,
                                     credit = ippis_Deduction,
                                     narration = master.narration,
@@ -507,7 +507,7 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                                     )
                                 deactivateLoan(loanItem)
                     
-                            userDeductions = allDeductions.filter(loanee=profile.user)
+                            userDeductions = allDeductions.filter(loanee=profile)
                             
                             # get principal loan amount
                             loanPrincipal  = loanItem.approved_amount
@@ -534,7 +534,7 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                             if(bal <= loanItem.monthly_deduction):
                                 ippis_Deduction = ippis_Deduction-bal
                                 Deduction.objects.create(  
-                                    loanee=profile.user,
+                                    loanee=profile,
                                     loan= loanItem,
                                     credit = bal,
                                     narration = master.narration,
@@ -547,7 +547,7 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                             elif(bal > loanItem.monthly_deduction):
                                 ippis_Deduction = ippis_Deduction-loanItem.monthly_deduction
                                 Deduction.objects.create(  
-                                    loanee=profile.user,
+                                    loanee=profile,
                                     loan= loanItem,
                                     credit = loanItem.monthly_deduction,
                                     narration = master.narration,
@@ -566,7 +566,7 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                                 # pay what ever that is remaining on the last loan
                                 
                                 Deduction.objects.create(  
-                                    loanee=profile.user,
+                                    loanee=profile,
                                     loan= loanItem,
                                     credit = ippis_Deduction,
                                     narration = master.narration,
@@ -578,7 +578,7 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                             
                             ippis_Deduction = ippis_Deduction-loanItem.monthly_deduction
                             Deduction.objects.create(  
-                                    loanee=profile.user,
+                                    loanee=profile,
                                     loan= loanItem,
                                     credit = loanItem.monthly_deduction,
                                     narration = master.narration,
@@ -596,7 +596,7 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                                 # pay what ever that is remaining on the last loan
                                 
                                 Deduction.objects.create(  
-                                    loanee=profile.user,
+                                    loanee=profile,
                                     loan= loanItem,
                                     credit = ippis_Deduction,
                                     narration = master.narration,
@@ -606,7 +606,7 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                                     )
                                 deactivateLoan(loanItem)
                     
-                            userDeductions = allDeductions.filter(loanee=profile.user)
+                            userDeductions = allDeductions.filter(loanee=profile)
                             
                             # get principal loan amount
                             loanPrincipal  = loanItem.approved_amount
@@ -633,7 +633,7 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                             if(bal <= loanItem.monthly_deduction):
                                 ippis_Deduction = ippis_Deduction-bal
                                 Deduction.objects.create(  
-                                    loanee=profile.user,
+                                    loanee=profile,
                                     loan= loanItem,
                                     credit = bal,
                                     narration = master.narration,
@@ -646,7 +646,7 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                             elif(bal > loanItem.monthly_deduction):
                                 ippis_Deduction = ippis_Deduction-loanItem.monthly_deduction
                                 Deduction.objects.create(  
-                                    loanee=profile.user,
+                                    loanee=profile,
                                     loan= loanItem,
                                     credit = loanItem.monthly_deduction,
                                     narration = master.narration,
