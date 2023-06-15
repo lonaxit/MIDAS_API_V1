@@ -563,7 +563,8 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                                 #     created_by=request.user,
                                 #     )
                                 # deactivateLoan(loanItem)
-                            print(loanItem.monthly_deduction)
+                            else: 
+                                print(loanItem.monthly_deduction)
                             
                     #         ippis_Deduction = ippis_Deduction-loanItem.monthly_deduction
                     #         Deduction.objects.create(  
