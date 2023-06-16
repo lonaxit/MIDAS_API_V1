@@ -55,7 +55,7 @@ def createLoanDeductions(userid):
                     # total cumulative deduction for a particular ippis number
                     ippis_Deduction = master.cumulative_amount
                     
-                    user_ = User.objects.filter(id=master.ippis_number)
+                    user_ = MasterLoanDeduction.objects.filter(ippis_number=master.ippis_number,active=True)
                     countUser = user_.count()
                     if countUser > 1 or countUser == 0:
                         continue
@@ -194,15 +194,12 @@ def createLoanDeductions(userid):
                     master.active = False
                     master.save()
                             
-                except Profile.DoesNotExist:
-                    continue
+                except ValueError as e:
+                    raise ValueError(f"Invalid value: {e}")
+                except TypeError as e:
+                    raise TypeError(f"Type error: {e}")  
                 
-            return Response(
-                {'msg':'Loan deductions created successfully'},
-                status = status.HTTP_201_CREATED
-                )
-        else:
-            raise ValidationError('No unprocessed deductions yet!')   
+                 
    
 # update loan deduction swith correct loan ids
 @shared_task
