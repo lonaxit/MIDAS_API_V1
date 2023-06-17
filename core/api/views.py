@@ -439,6 +439,22 @@ class DeductionDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Deduction.objects.all()
     serializer_class = DeductionSerializer
     permission_classes=[IsAuthenticated & IsAuthOrReadOnly] 
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def put(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
     
 
 # Create bulk deduction from a master deduction table
