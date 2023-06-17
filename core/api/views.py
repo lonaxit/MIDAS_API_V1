@@ -386,6 +386,7 @@ class DeductionDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = DeductionSerializer
     permission_classes=[IsAuthenticated & IsAuthOrReadOnly] 
     
+    
 
 # Create bulk deduction from a master deduction table
 class CreateBulkLoanDeduction(generics.CreateAPIView):
@@ -535,6 +536,8 @@ class DeductionCreate(generics.CreateAPIView):
              user = loanObj.owner
              
              serializer.save(loanee=user,loan=loanObj,created_by=self.request.user)
+            #  check to deactivate loan
+             deactivateLoan(loanObj)
              
         except Loan.DoesNotExist:
             
