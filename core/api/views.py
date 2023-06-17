@@ -449,11 +449,13 @@ class DeductionDetail(generics.RetrieveUpdateDestroyAPIView):
         serializer = self.get_serializer(instance, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        deactivateLoan(instance)
         return Response(serializer.data)
 
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.delete()
+        deactivateLoan(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
     
 
@@ -673,6 +675,7 @@ class DeductionCreate(generics.CreateAPIView):
              user = loanObj.owner
              
              serializer.save(loanee=user,loan=loanObj,created_by=self.request.user)
+             deactivateLoan(loanObj)
              
         except Loan.DoesNotExist:
             
