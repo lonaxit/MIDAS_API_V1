@@ -454,8 +454,9 @@ class DeductionDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
+        loanObj = instance.loan
         instance.delete()
-        deactivateLoan(instance)
+        deactivateLoan(loanObj)
         return Response(status=status.HTTP_204_NO_CONTENT)
     
 
