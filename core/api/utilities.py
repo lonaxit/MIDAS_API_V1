@@ -57,6 +57,10 @@ def deactivateLoan(loanObj):
       if bal == 0:
           loanObj.active = False
           loanObj.save()
+      else:
+          loanObj.active = True
+          loanObj.save()
+          
 
 def checkDistributionPlan(masterIPPISObj):
     pass
