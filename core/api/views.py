@@ -458,7 +458,24 @@ class DeductionDetail(generics.RetrieveUpdateDestroyAPIView):
         instance.delete()
         deactivateLoan(loanObj)
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
+# update loan status
+class toggleLoanStatusAPIView(generics.RetrieveUpdateAPIView):
+    queryset = Loan.objects.all()
+    serializer_class = LoanSerializer
+    # lookup_field = 'id'
+
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def put(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.active = not instance.active  # Toggle the status
+        instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)    
 
 # Create bulk deduction from a master deduction table
 class CreateBulkLoanDeduction(generics.CreateAPIView):
