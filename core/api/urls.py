@@ -23,6 +23,7 @@ urlpatterns =[
     path('<int:pk>/loans/', LoansByUser.as_view(), name='user-loans'),
     path('loan/<int:pk>/', LoanDetail.as_view(), name='loan-detail'),
     path('product/<int:pk>/loans/', LoansByProduct.as_view(), name="product-loans"),
+    path('<int:pk>/toggle/loan/', toggleLoanStatusAPIView.as_view(), name="toggle-loan"),
     
     
     path('masterdeduction/upload/',MonthlyLoanDeductionUpload.as_view(), name="upload-masterloan-deduction"),
