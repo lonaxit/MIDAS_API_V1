@@ -210,12 +210,6 @@ class LoanCreate(generics.CreateAPIView):
 #                     status=status.HTTP_404_NOT_FOUND)
 
 
-
-
-    
-   
-
-
 # list loans by an individual user
 class LoansByUser(generics.ListAPIView):
     """
