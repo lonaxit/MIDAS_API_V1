@@ -73,8 +73,6 @@ class CustomUserManager(BaseUserManager):
         user.save()
         return user
     
-      
-
 class CustomUser(AbstractBaseUser,PermissionsMixin):
     username = models.CharField(max_length=255,unique=True)
     first_name = models.CharField(max_length=255)
