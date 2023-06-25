@@ -88,10 +88,6 @@ urlpatterns =[
    
     path('loans/guarantor/<int:guarantor_id>/',ListGuaranteeLoans.as_view(), name='loans-by-guarantor'),
     
- 
-    
-    
-    
     # db migration
     path('user-migration/', MigrateUsers.as_view(),name='migrate-users'),
     
