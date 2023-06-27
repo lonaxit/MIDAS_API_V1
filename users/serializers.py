@@ -35,20 +35,24 @@ class UserSerializer(serializers.ModelSerializer):
     
     def get_totalSaving(self,object):
             
-        totalCredit = Saving.objects.filter(user=object.pk).aggregate(credit=Sum('credit'))
+        # totalCredit = Saving.objects.filter(user=object.pk).aggregate(credit=Sum('credit'))
         
-        totalDebit = Saving.objects.filter(user=object.pk).aggregate(debit=Sum('debit'))
+        # totalDebit = Saving.objects.filter(user=object.pk).aggregate(debit=Sum('debit'))
         
+        total_credit = Saving.objects.filter(user=object.pk).aggregate(credit=Sum('credit'))['credit'] or 0
+        total_debit = Saving.objects.filter(user=object.pk).aggregate(debit=Sum('debit'))['debit'] or 0
+        
+        payments = total_credit - total_debit
     
-        credit = totalCredit['credit']
-        debit = totalDebit['debit']
+        # credit = totalCredit['credit']
+        # debit = totalDebit['debit']
        
-        if not credit:
-            credit=0
-        if not debit:
-            debit=0            
+        # if not credit:
+        #     credit=0
+        # if not debit:
+        #     debit=0            
                         
-        payments = credit - debit
+        # payments = credit - debit
         
         return payments
     
