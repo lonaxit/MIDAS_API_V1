@@ -437,23 +437,29 @@ class CreateBulkLoanDeduction(generics.CreateAPIView):
                
                         # get principal loan amount
                         loanPrincipal  = singleLoan.approved_amount
-                           
-                        totalcredit = userDeductions.filter(loan=singleLoan).aggregate(credit=Sum('credit'))
-                        
-                        totaldebit = userDeductions.filter(loan=singleLoan).aggregate(debit=Sum('debit'))
-                        
-                        credits = totalcredit['credit']
-                        debits = totaldebit['debit']
-                        
-                        if not credits:
-                            credits =0
-                        if not debits:
-                            debits =0
-                            
-                        payments = credits-debits
-                        
-                        # balance
+                        loanDeductions = Deduction.objects.filter(loan=singleLoan)
+                        total_credit = loanDeductions.aggregate(credit=Sum('credit'))['credit'] or 0
+                        total_debit = loanDeductions.aggregate(debit=Sum('debit'))['debit'] or 0
+                                    
+                        payments = total_credit - total_debit
                         bal = loanPrincipal-payments
+                           
+                        # totalcredit = userDeductions.filter(loan=singleLoan).aggregate(credit=Sum('credit'))
+                        
+                        # totaldebit = userDeductions.filter(loan=singleLoan).aggregate(debit=Sum('debit'))
+                        
+                        # credits = totalcredit['credit']
+                        # debits = totaldebit['debit']
+                        
+                        # if not credits:
+                        #     credits =0
+                        # if not debits:
+                        #     debits =0
+                            
+                        # payments = credits-debits
+                        
+                        # # balance
+                        # bal = loanPrincipal-payments
                         
                         if(bal and bal <= singleLoan.monthly_deduction):
                             ippis_Deduction = ippis_Deduction-bal
