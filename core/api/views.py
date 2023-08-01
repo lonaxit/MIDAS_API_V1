@@ -438,7 +438,9 @@ class DeductionsList(generics.ListAPIView):
 class DeductionDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Deduction.objects.all()
     serializer_class = DeductionSerializer
-    permission_classes=[IsAuthenticated & IsAuthOrReadOnly] 
+    # 
+    # permission_classes=[IsAuthenticated & IsAuthOrReadOnly]
+    permission_classes=[IsAuthenticated] 
     def get(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
