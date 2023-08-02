@@ -451,7 +451,7 @@ class DeductionDetail(generics.RetrieveUpdateDestroyAPIView):
         serializer = self.get_serializer(instance, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        deactivateLoan(instance)
+        deactivateLoan(instance.loan)
         return Response(serializer.data)
 
     def delete(self, request, *args, **kwargs):
