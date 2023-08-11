@@ -387,16 +387,16 @@ class LoanUploadSerializer(serializers.Serializer):
     
 
 class MonthlyLoanDeductionSerializer(serializers.ModelSerializer):
-    total_amount = serializers.SerializerMethodField()
+    # total_amount = serializers.SerializerMethodField()
     
     class Meta:
         model = MasterLoanDeduction
         fields = "__all__"
 
-    def get_total_amount(self, obj):
-        previous_amount = MasterLoanDeduction.objects.filter(created__lte=obj.created)
-        total = sum(item.cumulative_amount for item in previous_amount)
-        return total + obj.cumulative_amount
+    # def get_total_amount(self, obj):
+    #     previous_amount = MasterLoanDeduction.objects.filter(created__lte=obj.created)
+    #     total = sum(item.cumulative_amount for item in previous_amount)
+    #     return total + obj.cumulative_amount
     
 
 class MasterLoanDeductionUploadSerializer(serializers.Serializer):
