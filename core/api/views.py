@@ -398,7 +398,7 @@ class MonthlyLoanDeductionUpload(generics.CreateAPIView):
             except Exception as e:
                 # raise ValidationError('A bad operation happened!')
                 return Response(
-                {'msg':'Something unexpected happened'},
+                {'msg':e},
                 status = status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
             
