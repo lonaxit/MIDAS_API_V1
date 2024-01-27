@@ -224,7 +224,7 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 # Celery Settings
 # railway
-CELERY_BROKER_URL='redis://default:BTKBUIj4ZRHdEDrOZGD3@containers-us-west-181.railway.app:5990'
+CELERY_BROKER_URL='redis://default:aoiK51IGoAbLMj4pM6i4jNHB5kE5lCmC@monorail.proxy.rlwy.net:13660'
 # Set up on render
 # CELERY_BROKER_URL = 'rediss://red-cgspo09jvhtrd2744bcg:FxktDLe9tDuiLaIpaasTVzXCQI8SrWN8@oregon-redis.render.com:6379'
 CELERY_ACCEPT_CONTENT= ['application/json']
