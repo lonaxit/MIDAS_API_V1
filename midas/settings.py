@@ -129,9 +129,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'midas.wsgi.application'
 
-
-
-
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
