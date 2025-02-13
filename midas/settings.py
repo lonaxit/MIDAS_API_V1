@@ -74,26 +74,29 @@ CORS_ORIGIN_ALLOW_ALL = True
 #     'https://midastouchonline.co',
 # )
 
-CORS_ALLOW_ALL_ORIGINS: False
+CORS_ALLOW_ALL_ORIGINS: True
 
 CORS_ALLOWED_ORIGINS = [
-    "https://midastouchonline.co",
+    # "https://midastouch.com.ng",
     # "https://www.midastouchonline.co",
     # "https://midas-frontend.onrender.com",
 ]
 
+CORS_ALLOW_HEADERS = ["*"]
+CORS_ALLOW_METHODS = ["*"]
+
 # Allow all headers
-CORS_ALLOW_HEADERS = [
-    "accept",
-    "accept-encoding",
-    "authorization",
-    "content-type",
-    "dnt",
-    "origin",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
-]
+# CORS_ALLOW_HEADERS = [
+#     "accept",
+#     "accept-encoding",
+#     "authorization",
+#     "content-type",
+#     "dnt",
+#     "origin",
+#     "user-agent",
+#     "x-csrftoken",
+#     "x-requested-with",
+# ]
 
 
 
