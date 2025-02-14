@@ -230,7 +230,7 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 
 # uncomment first
-# CELERY_BROKER_URL='redis://default:aoiK51IGoAbLMj4pM6i4jNHB5kE5lCmC@monorail.proxy.rlwy.net:13660'
+CELERY_BROKER_URL='redis://default:aoiK51IGoAbLMj4pM6i4jNHB5kE5lCmC@monorail.proxy.rlwy.net:13660'
 
 # legacy url railway
 # CELERY_BROKER_URL='redis://default:BTKBUIj4ZRHdEDrOZGD3@containers-us-west-181.railway.app:5990'
