@@ -64,8 +64,8 @@ INSTALLED_APPS = [
 
 # CORS_ORIGIN_ALLOW_ALL = True
 
-
-# ALLOWED_HOSTS=['http://localhost:8080','http://localhost:8000']
+# production
+ALLOWED_HOSTS=['*']
 
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -148,21 +148,22 @@ WSGI_APPLICATION = 'midas.wsgi.application'
 
 # production
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME':env('PGDATABASE'),
-        'USER':env('PGUSER'),
-        'PASSWORD':env('PGPASSWORD'),
-        'HOST': env('PGHOST'),
-        'PORT':env('PGPORT'),
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME':env('PGDATABASE'),
+#         'USER':env('PGUSER'),
+#         'PASSWORD':env('PGPASSWORD'),
+#         'HOST': env('PGHOST'),
+#         'PORT':env('PGPORT'),
+#     }
+# }
 
 # production
-# DATABASES={
-#     'default': dj_database_url.parse(env('DATABASE_URL'))
-# }
+DATABASES={
+    'default': dj_database_url.parse(env('DATABASE_PUBLIC_URL'))
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -226,7 +227,10 @@ AUTH_USER_MODEL = 'users.CustomUser'
 # Celery Settings
 # railway
 
-CELERY_BROKER_URL='redis://default:aoiK51IGoAbLMj4pM6i4jNHB5kE5lCmC@monorail.proxy.rlwy.net:13660'
+
+# uncomment first
+# CELERY_BROKER_URL='redis://default:aoiK51IGoAbLMj4pM6i4jNHB5kE5lCmC@monorail.proxy.rlwy.net:13660'
+
 # legacy url railway
 # CELERY_BROKER_URL='redis://default:BTKBUIj4ZRHdEDrOZGD3@containers-us-west-181.railway.app:5990'
 # Set up on render
