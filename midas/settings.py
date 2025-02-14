@@ -77,7 +77,8 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_ALL_ORIGINS: True
 
 CORS_ALLOWED_ORIGINS = [
-    # "https://midastouch.com.ng",
+    "https://www.midastouch.com.ng",
+    "https://midastouch.com.ng",
     # "https://www.midastouchonline.co",
     # "https://midas-frontend.onrender.com",
 ]
