@@ -22,7 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
     savinguser = SavingSerializer(many=True,read_only=True)
     loanowner = LoanSerializer(many=True,read_only=True)
     
-    totalSaving = serializers.SerializerMethodField()
+    # totalSaving = serializers.SerializerMethodField()
     # balance = serializers.SerializerMethodField()
     
     class Meta:

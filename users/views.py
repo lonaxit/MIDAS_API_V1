@@ -112,7 +112,8 @@ class RegistrationView(APIView):
     
 class RetrieveUserView(APIView):
     
-    permission_classes = [IsAuthenticated,IsAuthOrReadOnly]
+    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated,IsAuthOrReadOnly]
     
     def get(self,request):
         
