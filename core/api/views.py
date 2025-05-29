@@ -1,4 +1,3 @@
-
 import random
 import string
 import math
@@ -281,31 +280,15 @@ class LoansByUser(generics.ListAPIView):
     Returns:
         A list of loans for user
     """
-      
     serializer_class = LoanSerializer
     permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
-    lookup_field ='owner'
-    
-    # over writing default queryset 
+    lookup_field = 'owner'
+
     def get_queryset(self):
-        # get the wachlist pk
         user_pk = self.kwargs['pk']
-        # try:
-            # user = User.objects.get(pk=user_pk)
-        Loans = Loan.objects.filter(owner=user_pk)
-            
-            # if not Loans:
-            #     raise ValidationError('No Loans For This User')
-        return Loans
-        
-        # except User.DoesNotExist:
-            
-            # get_queryset shoud not return a response
-            # return Response({'Error': 'Movie Not Found'},status=status.HTTP_404_NOT_FOUND)
-            # raise ValidationError('User Does Not exist')
-       
-        
-    
+        # Optimize by selecting related fields to reduce DB hits
+        return Loan.objects.select_related('owner', 'product', 'created_by').filter(owner=user_pk)
+
 
 # get detail of a specific loan
 class LoanDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -826,6 +809,7 @@ class ListMasterSaving(generics.ListAPIView):
     queryset = SavingMaster.objects.filter(active=True).order_by('transaction_date')
     serializer_class = SavingMasterSerializer
     permission_classes=[IsAuthenticated & IsAuthOrReadOnly]
+
 
 # Manage Master Savings
 class MasterSavingDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -1563,7 +1547,7 @@ class MigrateMasterSavingDeductionCelery(generics.CreateAPIView):
 
 
 
- 
-        
-        
+
+
+
 
