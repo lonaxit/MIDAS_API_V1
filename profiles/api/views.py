@@ -54,12 +54,18 @@ class GetProfile(generics.RetrieveAPIView):
     serializer_class = ProfileSerializer
     # serializer_class = ProfileListSerializer
   
-    permission_classes= [IsAuthenticated & IsAuthOrReadOnly]
+    permission_classes= [IsAuthenticated , IsAuthOrReadOnly]
     lookup_field ='user'
     
     def get_queryset(self):
+        # return Profile.objects.filter(user=self.kwargs['user'])
+        # Optimize by joining the related user in one query
+        # return Profile.objects.select_related('user').all()
+        return Profile.objects.filter(user=self.kwargs['user']).select_related('user')
     
-        return Profile.objects.all()
+        # return Profile.objects.all()
+    
+    
 
 class GetProfileMobile(generics.RetrieveAPIView):
   
