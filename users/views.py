@@ -128,7 +128,7 @@ class RegistrationView(APIView):
 class RetrieveUserView(APIView):
     """
     Retrieve details of the currently logged-in user.
-    
+    This is new code
     Returns:
         Response: User details including profile information
     """
