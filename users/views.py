@@ -110,19 +110,48 @@ class RegistrationView(APIView):
  
 #  get logged in user info
     
-class RetrieveUserView(APIView):
+# class RetrieveUserView(APIView):
     
-    permission_classes = [IsAuthenticated]
-    # permission_classes = [IsAuthenticated,IsAuthOrReadOnly]
+#     permission_classes = [IsAuthenticated]
+#     # permission_classes = [IsAuthenticated,IsAuthOrReadOnly]
     
-    def get(self,request):
+#     def get(self,request):
         
-        # try:
-        user = request.user
-        user = UserSerializer(user)
-        return Response(
-                {'user':user.data},
-                status= status.HTTP_200_OK
+#         # try:
+#         user = request.user
+#         user = UserDetailSerializer(user)
+#         return Response(
+#                 {'user':user.data},
+#                 status= status.HTTP_200_OK
+#             )
+        
+class RetrieveUserView(APIView):
+    """
+    Retrieve details of the currently logged-in user.
+    
+    Returns:
+        Response: User details including profile information
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        try:
+            user = request.user
+            serializer = UserDetailSerializer(user)
+            return Response(
+                {
+                    'status': 'success',
+                    'data': serializer.data
+                },
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response(
+                {
+                    'status': 'error',
+                    'message': str(e)
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
  
 #  get logged in user info
