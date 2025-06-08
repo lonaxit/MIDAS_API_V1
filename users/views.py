@@ -141,7 +141,7 @@ class RetrieveUserView(APIView):
             return Response(
                 {
                     'status': 'success',
-                    'data': serializer.data
+                    'user': serializer.data
                 },
                 status=status.HTTP_200_OK
             )
